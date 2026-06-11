@@ -69,6 +69,15 @@ firebase.auth().onAuthStateChanged(async (user) => {
                 // Pass the resolved targetUID to DB init
                 await DB.init(targetUid);
 
+                // Determine User Role
+                window._userRole = 'Owner';
+                if (window._isSubUser) {
+                    const sysUser = DB.select('SELECT role FROM system_users WHERE id=?', [user.uid]);
+                    if (sysUser && sysUser.length > 0) {
+                        window._userRole = sysUser[0].role;
+                    }
+                }
+
                 // Set Chart.js global defaults
                 Utils.chartDefaults();
 

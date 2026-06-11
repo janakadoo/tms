@@ -105,7 +105,7 @@ export const SettingsModule = {
                                 </tbody>
                             </table>
                         </div>
-                        <form id="addUserForm" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:1rem;align-items:end;background:var(--bg-elevated);padding:1rem;border-radius:var(--r-md)">
+                        <form id="addUserForm" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:1rem;align-items:end;background:var(--bg-elevated);padding:1rem;border-radius:var(--r-md)">
                             <div class="form-group">
                                 <label class="form-label">Name</label>
                                 <input type="text" class="form-input" id="newUserName" required placeholder="John Doe">
@@ -118,12 +118,21 @@ export const SettingsModule = {
                                 <label class="form-label">Password</label>
                                 <input type="text" class="form-input" id="newUserPass" required placeholder="TempPass123!">
                             </div>
+                            <div class="form-group">
+                                <label class="form-label">Role</label>
+                                <select class="form-select" id="newUserRole">
+                                    <option value="Manager">Manager</option>
+                                    <option value="Data Entry">Data Entry</option>
+                                    <option value="Viewer">Viewer</option>
+                                </select>
+                            </div>
                             <button type="submit" class="btn btn-primary" id="addUserBtn">Add User</button>
                         </form>
                     </div>
                 </div>
                 ` : ''}
 
+                ${!window._isSubUser ? `
                 <!-- Database Management -->
                 <div class="card">
                     <div class="card-header">
@@ -168,6 +177,7 @@ export const SettingsModule = {
                         </button>
                     </div>
                 </div>
+                ` : ''}
             </div>
         </div>`;
 
@@ -246,6 +256,7 @@ export const SettingsModule = {
                 const name  = document.getElementById('newUserName').value;
                 const email = document.getElementById('newUserEmail').value;
                 const pass  = document.getElementById('newUserPass').value;
+                const role  = document.getElementById('newUserRole').value;
                 
                 btn.textContent = 'Adding...';
                 btn.disabled = true;
@@ -264,7 +275,7 @@ export const SettingsModule = {
                         id: newUid,
                         email: email,
                         name: name,
-                        role: 'Staff',
+                        role: role,
                         status: 'Active'
                     });
 
