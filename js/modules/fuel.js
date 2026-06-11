@@ -205,8 +205,8 @@ export const FuelModule = {
         if (!canvas) return;
         if (FuelModule._chart) { FuelModule._chart.destroy(); FuelModule._chart = null; }
         const data   = DB.Analytics.monthlyCosts(6);
-        const labels = data.map(d => Utils.monthLabel(d.period));
-        const values = data.map(d => +(d.fuel||0));
+        const labels = data.labels;
+        const values = data.fuel;
         FuelModule._chart = new Chart(canvas, {
             type: 'bar',
             data: {
