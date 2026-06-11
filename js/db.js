@@ -153,6 +153,11 @@ export const DB = {
         try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN driver_id TEXT DEFAULT ''`); } catch(e) {}
         try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN fill_date TEXT DEFAULT ''`); } catch(e) {}
         try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN receipt_no TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN trip_id TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN fill_phase TEXT DEFAULT 'general'`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN date TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN cost_per_liter REAL DEFAULT 0`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE fuel_logs ADD COLUMN full_tank INTEGER DEFAULT 0`); } catch(e) {}
         try { DB._db.run(`UPDATE fuel_logs SET fill_date = date WHERE fill_date = '' AND date IS NOT NULL`); } catch(e) {}
 
         // Migrate expenses from v2 to v3 schema
@@ -207,8 +212,8 @@ export const DB = {
             )`);
         DB._db.run(`
             CREATE TABLE IF NOT EXISTS fuel_logs (
-                id TEXT PRIMARY KEY, vehicle_id TEXT, driver_id TEXT,
-                fill_date TEXT, liters REAL, total_cost REAL,
+                id TEXT PRIMARY KEY, vehicle_id TEXT, driver_id TEXT, trip_id TEXT DEFAULT '', fill_phase TEXT DEFAULT 'general',
+                fill_date TEXT, date TEXT DEFAULT '', liters REAL, cost_per_liter REAL DEFAULT 0, total_cost REAL, full_tank INTEGER DEFAULT 0,
                 odometer REAL, station TEXT, receipt_no TEXT, notes TEXT,
                 attachment_id TEXT DEFAULT '',
                 created_at TEXT DEFAULT (datetime('now'))
@@ -480,7 +485,7 @@ export const DB = {
         }
     },
 
-    /* ── ATTACHMENTS (IndexedDB – unchanged) ─────────────────── */
+    /* ── ATTACHMENTS (IndexedDB) ─────────────────────────────────── */
     Attachments: {
         _db: null,
         async init() {
@@ -496,10 +501,10 @@ export const DB = {
                 req.onerror   = e => { console.error('IndexedDB error', e); res(); };
             });
         },
-        async save(id, blob) {
+        async save(id, dataUrl, type) {
             return new Promise((res, rej) => {
                 const tx  = DB.Attachments._db.transaction('files', 'readwrite');
-                const req = tx.objectStore('files').put({ id, blob });
+                const req = tx.objectStore('files').put({ id, dataUrl, type });
                 req.onsuccess = () => res();
                 req.onerror   = e  => rej(e);
             });
@@ -508,7 +513,16 @@ export const DB = {
             return new Promise((res, rej) => {
                 const tx  = DB.Attachments._db.transaction('files', 'readonly');
                 const req = tx.objectStore('files').get(id);
-                req.onsuccess = e  => res(e.target.result?.blob || null);
+                req.onsuccess = e  => {
+                    const r = e.target.result;
+                    if (!r) return res(null);
+                    if (r.blob && !r.dataUrl) {
+                        r.dataUrl = r.blob;
+                        const match = r.blob.match(/^data:(.*?);base64/);
+                        r.type = match ? match[1] : 'image/jpeg';
+                    }
+                    res(r);
+                };
                 req.onerror   = e  => rej(e);
             });
         },
