@@ -180,8 +180,11 @@
                     <span class="notif-count hidden" id="topbarAlertCount">0</span>
                 </a>
                 <div class="user-pill">
-                    <div class="user-avatar">A</div>
-                    <span class="user-name" id="companyLabel">Admin</span>
+                    <div class="user-avatar" id="topbarAvatar">A</div>
+                    <div style="display:flex;flex-direction:column;line-height:1.2;align-items:flex-start">
+                        <span class="user-name" id="topbarUserName" style="font-size:0.875rem;font-weight:600;color:var(--text-primary)">Admin</span>
+                        <span id="topbarRoleName" style="font-size:0.7rem;color:var(--text-muted)">Owner</span>
+                    </div>
                 </div>
                 <button class="topbar-btn" id="logoutBtn" title="Log Out" style="color:var(--danger)">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>

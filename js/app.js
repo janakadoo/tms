@@ -69,14 +69,35 @@ firebase.auth().onAuthStateChanged(async (user) => {
                 // Pass the resolved targetUID to DB init
                 await DB.init(targetUid);
 
-                // Determine User Role
+                // Determine User Role and Display Name
                 window._userRole = 'Owner';
+                let displayName = 'Admin';
+
                 if (window._isSubUser) {
-                    const sysUser = DB.select('SELECT role FROM system_users WHERE id=?', [user.uid]);
+                    const sysUser = DB.select('SELECT name, role FROM system_users WHERE id=?', [user.uid]);
                     if (sysUser && sysUser.length > 0) {
                         window._userRole = sysUser[0].role;
+                        displayName = sysUser[0].name;
+                    } else {
+                        displayName = user.email.split('@')[0];
                     }
+                } else {
+                    displayName = 'Super Admin';
                 }
+
+                // Update Topbar User Pill
+                const nameLbl = document.getElementById('topbarUserName');
+                const roleLbl = document.getElementById('topbarRoleName');
+                const avatar  = document.getElementById('topbarAvatar');
+                
+                if (nameLbl) nameLbl.textContent = displayName;
+                if (roleLbl) roleLbl.textContent = window._userRole;
+                if (avatar)  avatar.textContent  = displayName.charAt(0).toUpperCase();
+
+                // Set Company name in the sidebar brand
+                const cname = DB.Settings.get('company_name') || 'TMS Pro';
+                const sidebarBrandName = document.querySelector('.sidebar-brand .brand-name');
+                if (sidebarBrandName) sidebarBrandName.textContent = cname;
 
                 // Set Chart.js global defaults
                 Utils.chartDefaults();
@@ -87,11 +108,6 @@ firebase.auth().onAuthStateChanged(async (user) => {
                 // Apply saved theme
                 const savedTheme = DB.Settings.get('theme') || 'dark';
                 if (savedTheme === 'light') applyLightMode();
-
-                // Set company label (or fallback to email if not set)
-                const cname = DB.Settings.get('company_name') || user.email.split('@')[0];
-                const lbl   = document.getElementById('companyLabel');
-                if (lbl) lbl.textContent = cname;
 
                 // Setup sidebar collapse
                 const sidebarToggle = document.getElementById('sidebarToggle');
