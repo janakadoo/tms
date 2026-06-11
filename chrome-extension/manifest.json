@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "VMS Auto-Login",
+  "version": "1.0",
+  "description": "Automatic login for VMS tracking system",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://en.aika168.com/*",
+    "http://en.aika168.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://en.aika168.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

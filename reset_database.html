@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VMS - Database Reset</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #4f46e5;
+        }
+
+        .log {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔧 VMS Database Reset Tool</h1>
+    <p>Click the button below to reset and seed your vehicle database.</p>
+
+    <button onclick="resetAndSeed()">Reset & Add All 10 Vehicles</button>
+
+    <div class="log" id="log"></div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += message + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function resetAndSeed() {
+            log('🧹 Clearing existing data...');
+            localStorage.clear();
+
+            log('📦 Creating vehicle database...');
+
+            const vehicles = [
+                // BIKES
+                { id: 'v_bike_1', regNo: 'Sampath', brand: 'Bike', model: 'Bike', type: 'Bike', trackingId: '9170997653', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Petrol', year: 2023 },
+                { id: 'v_bike_2', regNo: 'Prathap', brand: 'Bike', model: 'Bike', type: 'Bike', trackingId: '9176093889', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Petrol', year: 2023 },
+                { id: 'v_bike_3', regNo: 'Naween', brand: 'Bike', model: 'Bike', type: 'Bike', trackingId: '9175376733', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Petrol', year: 2023 },
+                { id: 'v_bike_4', regNo: 'Upali', brand: 'Bike', model: 'Bike', type: 'Bike', trackingId: '9175380028', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Petrol', year: 2023 },
+                { id: 'v_bike_5', regNo: 'Thimal', brand: 'Bike', model: 'Bike', type: 'Bike', trackingId: '9176093835', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Petrol', year: 2023 },
+                { id: 'v_bike_6', regNo: 'Dinesh', brand: 'Bike', model: 'Bike', type: 'Bike', trackingId: '9176044130', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Petrol', year: 2023 },
+
+                // LORRIES
+                { id: 'v_lorry_1', regNo: 'LL-9815', brand: 'Leyland', model: 'Truck', type: 'Lorry', trackingId: '9175379873', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Diesel', year: 2023 },
+                { id: 'v_lorry_2', regNo: 'LL-0906', brand: 'Leyland', model: 'Truck', type: 'Lorry', trackingId: '9175379916', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Diesel', year: 2023 },
+                { id: 'v_lorry_3', regNo: 'LL-6343', brand: 'Leyland', model: 'Truck', type: 'Lorry', trackingId: '9175376434', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Diesel', year: 2023 },
+
+                // VANS
+                { id: 'v_van_1', regNo: 'Shihardeen', brand: 'Van', model: 'Van', type: 'Van', trackingId: '9175376462', trackingPassword: 'Track@2023', status: 'Active', fuelType: 'Diesel', year: 2023 }
+            ];
+
+            localStorage.setItem('vms_vehicles', JSON.stringify(vehicles));
+
+            vehicles.forEach(v => {
+                log(`✅ Added: ${v.regNo} (${v.type}) - ID: ${v.trackingId}`);
+            });
+
+            log('');
+            log('🎉 SUCCESS! Added ' + vehicles.length + ' vehicles');
+            log('');
+            log('👉 Now close this tab and refresh your VMS page');
+        }
+    </script>
+</body>
+
+</html>

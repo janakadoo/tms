@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VMS Auto-Login Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .instructions {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .category {
+            margin-bottom: 30px;
+        }
+
+        .category h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bookmarklet {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            display: inline-block;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px;
+            cursor: move;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .bookmarklet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .bookmarklet:active {
+            transform: translateY(0);
+        }
+
+        .vehicle-name {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .vehicle-id {
+            font-size: 12px;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            color: #856404;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 VMS Auto-Login Setup</h1>
+        <p class="subtitle">One-time setup for instant automatic login</p>
+
+        <div class="instructions">
+            <h3>📖 How to Use (Easy 3 Steps):</h3>
+            <ol>
+                <li><strong>Drag</strong> the green buttons below to your bookmarks bar</li>
+                <li><strong>Open</strong> <a href="https://en.aika168.com/" target="_blank">en.aika168.com</a></li>
+                <li><strong>Click</strong> the bookmark for your vehicle → Instant login! 🎉</li>
+            </ol>
+        </div>
+
+        <div class="alert">
+            ⚠️ <strong>Important:</strong> Make sure your bookmarks bar is visible (Press Ctrl+Shift+B in most browsers)
+        </div>
+
+        <div id="bookmarklets"></div>
+    </div>
+
+    <script>
+        const vehicles = [
+            // BIKES
+            { name: 'Sampath', type: '🏍️ Bike', id: '9170997653', pwd: 'Track@2023' },
+            { name: 'Prathap', type: '🏍️ Bike', id: '9176093889', pwd: 'Track@2023' },
+            { name: 'Naween', type: '🏍️ Bike', id: '9175376733', pwd: 'Track@2023' },
+            { name: 'Upali', type: '🏍️ Bike', id: '9175380028', pwd: 'Track@2023' },
+            { name: 'Thimal', type: '🏍️ Bike', id: '9176093835', pwd: 'Track@2023' },
+            { name: 'Dinesh', type: '🏍️ Bike', id: '9176044130', pwd: 'Track@2023' },
+
+            // LORRIES
+            { name: 'LL-9815', type: '🚛 Lorry', id: '9175379873', pwd: 'Track@2023' },
+            { name: 'LL-0906', type: '🚛 Lorry', id: '9175379916', pwd: 'Track@2023' },
+            { name: 'LL-6343', type: '🚛 Lorry', id: '9175376434', pwd: 'Track@2023' },
+
+            // VANS
+            { name: 'Shihardeen', type: '🚐 Van', id: '9175376462', pwd: 'Track@2023' }
+        ];
+
+        // Group by type
+        const groups = {
+            '🏍️ Bikes': vehicles.filter(v => v.type.includes('Bike')),
+            '🚛 Lorries': vehicles.filter(v => v.type.includes('Lorry')),
+            '🚐 Vans': vehicles.filter(v => v.type.includes('Van'))
+        };
+
+        const container = document.getElementById('bookmarklets');
+
+        for (const [category, items] of Object.entries(groups)) {
+            const section = document.createElement('div');
+            section.className = 'category';
+
+            const heading = document.createElement('h2');
+            heading.textContent = category;
+            section.appendChild(heading);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            items.forEach(v => {
+                const bookmarkletCode = `javascript:(function(){try{var t=document.querySelector('a[href*="ID"]');if(t)t.click();setTimeout(function(){var i=document.querySelector('input[name*="txtLoginName"],input[id*="txtLoginName"]');var p=document.querySelector('input[name*="txtPassword"],input[type="password"]');if(i&&p){i.value='${v.id}';p.value='${v.pwd}';var b=document.querySelector('input[type="submit"],button[type="submit"],.btnLogin,#btnLogin');if(b){b.click();}else{alert('✅ Filled! Click GO button')}}else{alert('Please wait for page to load')}},800)}catch(e){alert('Error: '+e.message)}})();`;
+
+                const link = document.createElement('a');
+                link.href = bookmarkletCode;
+                link.className = 'bookmarklet';
+                link.draggable = true;
+                link.innerHTML = `
+                    <div class="vehicle-name">${v.name}</div>
+                    <div class="vehicle-id">ID: ${v.id}</div>
+                `;
+                link.title = 'Drag this to your bookmarks bar';
+
+                grid.appendChild(link);
+            });
+
+            section.appendChild(grid);
+            container.appendChild(section);
+        }
+    </script>
+</body>
+
+</html>
