@@ -295,6 +295,13 @@
     animation: scaleIn 0.22s ease forwards;
 }
 
+.modal form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
 .modal-lg  { max-width: 700px; }
 .modal-xl  { max-width: 900px; }
 .modal-sm  { max-width: 380px; }
