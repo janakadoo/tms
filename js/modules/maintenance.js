@@ -156,7 +156,7 @@ export const MaintenanceModule = {
                 <td><div class="table-cell-main">${Utils.esc(r.reg_no||'—')}</div><div class="table-cell-sub">${Utils.esc(r.vehicle_name||'')}</div></td>
                 <td>${Utils.esc(r.type)}</td>
                 <td>${r.date ? Utils.formatDate(r.date) : '<span class="text-muted-c text-xs">Not done</span>'}</td>
-                <td>${Utils.esc(r.garage||'—')}</td>
+                <td>${Utils.esc(r.workshop||r.garage||'—')}</td>
                 <td>${+r.cost > 0 ? `<span style="font-weight:600;color:var(--danger)">${Utils.currency(r.cost,sym)}</span>` : '—'}</td>
                 <td>${r.next_due_date ? `<span class="expiry-tag ${overdue?'expiry-expired':'expiry-ok'}">${Utils.formatDate(r.next_due_date)}</span>` : '—'}</td>
                 <td>${r.next_due_km ? (+r.next_due_km).toLocaleString()+' km' : '—'}</td>

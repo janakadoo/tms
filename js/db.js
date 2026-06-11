@@ -375,9 +375,9 @@ export const DB = {
             LEFT JOIN vehicles v ON m.vehicle_id = v.id
             ORDER BY m.date DESC`),
         add: m => DB.run(`INSERT INTO maintenance (id,vehicle_id,date,type,odometer,cost,workshop,description,next_due_date,next_due_km,status,attachment_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-            [m.id,m.vehicle_id,m.date,m.type,m.odometer,m.cost,m.workshop,m.description,m.next_due_date,m.next_due_km,m.status,m.attachment_id||'']),
+            [m.id, m.vehicle_id, m.date||'', m.type||'', m.odometer||0, m.cost||0, m.workshop||m.garage||'', m.description||'', m.next_due_date||'', m.next_due_km||0, m.status||'Completed', m.attachment_id||'']),
         update: m => DB.run(`UPDATE maintenance SET vehicle_id=?,date=?,type=?,odometer=?,cost=?,workshop=?,description=?,next_due_date=?,next_due_km=?,status=?,attachment_id=? WHERE id=?`,
-            [m.vehicle_id,m.date,m.type,m.odometer,m.cost,m.workshop,m.description,m.next_due_date,m.next_due_km,m.status,m.attachment_id||'',m.id]),
+            [m.vehicle_id, m.date||'', m.type||'', m.odometer||0, m.cost||0, m.workshop||m.garage||'', m.description||'', m.next_due_date||'', m.next_due_km||0, m.status||'Completed', m.attachment_id||'', m.id]),
         delete: id => DB.run('DELETE FROM maintenance WHERE id=?',[id]),
     },
 
