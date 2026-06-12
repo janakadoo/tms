@@ -183,6 +183,7 @@ export const DriverModule = {
                 <td>${Utils.driverStatusBadge(d.status)}</td>
                 <td>
                     <div class="table-actions">
+                        <button class="btn-icon" data-view="${d.id}" title="View Details" style="color:var(--success)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                         ${d.license_attachment_id ? `<button class="btn-icon" data-view-att="${d.license_attachment_id}" title="View License" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg></button>` : ''}
                         <button class="btn-icon" data-edit="${d.id}" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
@@ -248,6 +249,33 @@ export const DriverModule = {
                     ? `<span style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg> File attached</span>` 
                     : '';
                 openFn();
+            };
+        });
+
+        document.querySelectorAll('[data-view]').forEach(btn => {
+            btn.onclick = () => {
+                const d = DB.Drivers.getById(btn.dataset.view);
+                if (!d) return;
+                const html = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">NAME</strong><br>${Utils.esc(d.name)}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">EMAIL</strong><br>${Utils.esc(d.email || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">CONTACT</strong><br>${Utils.esc(d.contact || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">EMERGENCY</strong><br>${Utils.esc(d.emergency_contact || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">LICENSE NO</strong><br>${Utils.esc(d.license_no || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">LICENSE EXPIRY</strong><br>${d.license_expiry ? Utils.formatDate(d.license_expiry) : '—'}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">BLOOD GROUP</strong><br>${Utils.esc(d.blood_group || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">JOINED DATE</strong><br>${d.joined_date ? Utils.formatDate(d.joined_date) : '—'}</div>
+                        <div style="grid-column:1/-1;"><strong style="color:var(--text-muted);font-size:0.75rem;">ADDRESS</strong><br>${Utils.esc(d.address || '—')}</div>
+                    </div>
+                    <div>
+                        <strong style="color:var(--text-muted);font-size:0.75rem;">NOTES / REMARKS</strong>
+                        <div style="background:var(--bg-input);padding:0.75rem;border-radius:var(--r-md);margin-top:0.5rem;min-height:60px;">
+                            ${Utils.esc(d.notes || 'No remarks provided.')}
+                        </div>
+                    </div>
+                `;
+                Utils.viewDialog('Driver Details', html);
             };
         });
 

@@ -241,6 +241,7 @@ export const VehicleModule = {
                 <td>${v.trip_count || 0}</td>
                 <td>
                     <div class="table-actions">
+                        <button class="btn-icon" data-view="${v.id}" title="View Details" style="color:var(--success)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                         ${v.insurance_attachment_id ? `<button class="btn-icon" data-view-att="${v.insurance_attachment_id}" title="View Insurance" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg></button>` : ''}
                         ${v.revenue_attachment_id ? `<button class="btn-icon" data-view-att="${v.revenue_attachment_id}" title="View Revenue License" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></button>` : ''}
                         ${v.eco_attachment_id ? `<button class="btn-icon" data-view-att="${v.eco_attachment_id}" title="View Eco Test" style="color:var(--success)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg></button>` : ''}
@@ -324,6 +325,34 @@ export const VehicleModule = {
                 document.getElementById('vehEcoInfo').innerHTML       = v.eco_attachment_id ? fileHtml : '';
                 
                 openFn();
+            };
+        });
+        
+        document.querySelectorAll('[data-view]').forEach(btn => {
+            btn.onclick = () => {
+                const v = DB.Vehicles.getById(btn.dataset.view);
+                if (!v) return;
+                const html = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">REG. NO</strong><br>${Utils.esc(v.reg_no)}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">BRAND & MODEL</strong><br>${Utils.esc(v.brand)} ${Utils.esc(v.model)}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">YEAR</strong><br>${Utils.esc(v.year || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">TYPE</strong><br>${Utils.esc(v.type || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">FUEL TYPE</strong><br>${Utils.esc(v.fuel_type || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">ODOMETER</strong><br>${v.odometer ? (+v.odometer).toLocaleString() + ' km' : '—'}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">ENGINE NO</strong><br>${Utils.esc(v.engine_no || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">CHASSIS NO</strong><br>${Utils.esc(v.chassis_no || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">INSURANCE EXPIRY</strong><br>${v.insurance_expiry ? Utils.formatDate(v.insurance_expiry) : '—'}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">ROAD TAX EXPIRY</strong><br>${v.road_tax_expiry ? Utils.formatDate(v.road_tax_expiry) : '—'}</div>
+                    </div>
+                    <div>
+                        <strong style="color:var(--text-muted);font-size:0.75rem;">NOTES / REMARKS</strong>
+                        <div style="background:var(--bg-input);padding:0.75rem;border-radius:var(--r-md);margin-top:0.5rem;min-height:60px;">
+                            ${Utils.esc(v.notes || 'No remarks provided.')}
+                        </div>
+                    </div>
+                `;
+                Utils.viewDialog('Vehicle Details', html);
             };
         });
         
