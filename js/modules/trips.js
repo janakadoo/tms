@@ -258,6 +258,7 @@ export const TripModule = {
                 <td>${Utils.tripStatusBadge(t.status)}</td>
                 <td>
                     <div class="table-actions">
+                        <button class="btn-icon" data-view="${t.id}" title="View Details" style="color:var(--success)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                         <button class="btn-icon" style="color:var(--amber);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.08)" title="Fuel Consumption Monitor" data-fuel="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
                         </button>
@@ -480,6 +481,32 @@ export const TripModule = {
                 document.getElementById('distanceKm').value = t.distance_km || '';
                 if (t.start_odometer && t.end_odometer) calcDist();
                 openTrip();
+            };
+        });
+
+        // View trip details
+        document.querySelectorAll('[data-view]').forEach(btn => {
+            btn.onclick = () => {
+                const t = DB.Trips.getById(btn.dataset.view);
+                if (!t) return;
+                const html = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">DATE</strong><br>${Utils.formatDate(t.start_date)} - ${t.end_date ? Utils.formatDate(t.end_date) : 'Ongoing'}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">VEHICLE</strong><br>${Utils.esc(t.reg_no || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">DRIVER</strong><br>${Utils.esc(t.driver_name || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">PURPOSE</strong><br>${Utils.esc(t.purpose || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">DISTANCE</strong><br>${t.start_odometer ? (+t.start_odometer).toLocaleString() : '—'} ${t.end_odometer ? '→ ' + (+t.end_odometer).toLocaleString() : ''}<br>Total: <strong>${t.distance_km > 0 ? (+t.distance_km).toFixed(1) + ' km' : '—'}</strong></div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">REVENUE</strong><br><span style="color:var(--success);font-weight:600;">${+t.revenue > 0 ? Utils.currency(t.revenue) : '—'}</span></div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">STATUS</strong><br>${Utils.tripStatusBadge(t.status)}</div>
+                    </div>
+                    <div>
+                        <strong style="color:var(--text-muted);font-size:0.75rem;">NOTES / REMARKS</strong>
+                        <div style="background:var(--bg-input);padding:0.75rem;border-radius:var(--r-md);margin-top:0.5rem;min-height:60px;">
+                            ${Utils.esc(t.notes || 'No remarks provided.')}
+                        </div>
+                    </div>
+                `;
+                Utils.viewDialog('Trip Details', html);
             };
         });
 
