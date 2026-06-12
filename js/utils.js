@@ -169,6 +169,33 @@ export const Utils = {
         });
     },
 
+    /* ── VIEW DIALOG ────────────────────────────────────────── */
+    viewDialog(title, contentHTML) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay open';
+        overlay.style.zIndex = '1200';
+        overlay.innerHTML = `
+            <div class="modal modal-md anim-scale">
+                <div class="modal-header">
+                    <div class="modal-header-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="color:var(--info);width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                        ${Utils.esc(title)}
+                    </div>
+                    <button class="modal-close" id="_view_close"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+                <div class="modal-body">
+                    ${contentHTML}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="_view_ok">Close</button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        const close = () => overlay.remove();
+        overlay.querySelector('#_view_close').onclick = close;
+        overlay.querySelector('#_view_ok').onclick = close;
+    },
+
     /* ── ATTACHMENTS ────────────────────────────────────────── */
     fileToDataURL(file) {
         return new Promise((resolve, reject) => {

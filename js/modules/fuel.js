@@ -188,6 +188,7 @@ export const FuelModule = {
                 <td>${l.full_tank == 1 ? '<span class="badge badge-success">Full</span>' : '<span class="badge badge-neutral">Partial</span>'}</td>
                 <td>
                     <div class="table-actions">
+                        <button class="btn-icon" data-view="${l.id}" title="View Details" style="color:var(--success)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                         ${l.attachment_id ? `<button class="btn-icon" data-view-att="${l.attachment_id}" title="View Receipt" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg></button>` : ''}
                         <button class="btn-icon" data-edit="${l.id}" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
@@ -283,6 +284,32 @@ export const FuelModule = {
                     ? `<span style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg> File attached</span>` 
                     : '';
                 openFn();
+            };
+        });
+
+        document.querySelectorAll('[data-view]').forEach(btn => {
+            btn.onclick = () => {
+                const f = DB.Fuel.getById(btn.dataset.view);
+                if (!f) return;
+                const html = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">DATE</strong><br>${Utils.formatDate(f.date)}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">VEHICLE</strong><br>${Utils.esc(f.reg_no)}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">DRIVER</strong><br>${Utils.esc(f.driver_name || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">STATION</strong><br>${Utils.esc(f.station || '—')}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">LITERS</strong><br>${f.liters} L (${f.full_tank == 1 ? 'Full' : 'Partial'})</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">TOTAL COST</strong><br><span style="color:var(--danger);font-weight:600;">${Utils.currency(f.total_cost)}</span></div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">ODOMETER</strong><br>${f.odometer ? (+f.odometer).toLocaleString()+' km' : '—'}</div>
+                        <div><strong style="color:var(--text-muted);font-size:0.75rem;">RECEIPT NO</strong><br>${Utils.esc(f.receipt_no || '—')}</div>
+                    </div>
+                    <div>
+                        <strong style="color:var(--text-muted);font-size:0.75rem;">REMARKS / NOTES</strong>
+                        <div style="background:var(--bg-input);padding:0.75rem;border-radius:var(--r-md);margin-top:0.5rem;min-height:60px;">
+                            ${Utils.esc(f.notes || 'No remarks provided.')}
+                        </div>
+                    </div>
+                `;
+                Utils.viewDialog('Fuel Log Details', html);
             };
         });
 
