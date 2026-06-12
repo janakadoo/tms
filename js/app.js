@@ -481,6 +481,7 @@ function renderCostChart() {
             ]
         },
         options: {
+            maintainAspectRatio: false,
             responsive: true, interaction: { mode: 'index', intersect: false },
             plugins: { legend: { position: 'top' } },
             scales: {
@@ -504,7 +505,7 @@ function renderExpChart() {
             labels: expData.labels,
             datasets: [{ data: expData.data, backgroundColor: COLORS.slice(0,expData.labels.length), borderWidth: 2, borderColor: 'var(--bg-card)', hoverBorderColor: 'var(--border-strong)' }]
         },
-        options: { responsive: true, cutout: '65%', plugins: { legend: { position: 'right' } } }
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right' } } }
     });
 }
 
@@ -531,6 +532,7 @@ function renderTripChart() {
             ]
         },
         options: {
+            maintainAspectRatio: false,
             responsive: true, interaction: { mode: 'index', intersect: false },
             plugins: { legend: { position: 'top' } },
             scales: {

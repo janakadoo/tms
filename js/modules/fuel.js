@@ -214,7 +214,7 @@ export const FuelModule = {
                 labels,
                 datasets: [{ label: 'Fuel Cost (Rs.)', data: values, backgroundColor: 'rgba(99,102,241,0.7)', borderColor: '#6366f1', borderWidth: 1.5, borderRadius: 6 }]
             },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
         });
     },
 
