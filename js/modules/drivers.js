@@ -139,6 +139,12 @@ export const DriverModule = {
                             <label class="form-label">Notes</label>
                             <textarea name="notes" class="form-textarea" placeholder="Additional notes..."></textarea>
                         </div>
+                        <div class="form-group" style="padding-top:0.5rem; border-top:1px solid var(--border-light)">
+                            <label class="form-label">Driving License Copy</label>
+                            <input type="file" id="driverLicenseFile" class="form-input" accept="image/jpeg, image/png, application/pdf">
+                            <input type="hidden" name="license_attachment_id" id="driverLicenseId">
+                            <div id="driverLicenseInfo" style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-muted)"></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" id="driverModalCancel">Cancel</button>
@@ -177,6 +183,7 @@ export const DriverModule = {
                 <td>${Utils.driverStatusBadge(d.status)}</td>
                 <td>
                     <div class="table-actions">
+                        ${d.license_attachment_id ? `<button class="btn-icon" data-view-att="${d.license_attachment_id}" title="View License" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg></button>` : ''}
                         <button class="btn-icon" data-edit="${d.id}" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
                         </button>
@@ -197,20 +204,37 @@ export const DriverModule = {
         document.getElementById('addDriverBtn').onclick = () => {
             document.getElementById('driverModalTitle').textContent = 'Add Driver';
             form.reset(); form.elements['id'].value = '';
+            document.getElementById('driverLicenseInfo').innerHTML = '';
             openFn();
         };
         document.getElementById('driverModalClose').onclick  = closeFn;
         document.getElementById('driverModalCancel').onclick = closeFn;
         modal.onclick = e => { if (e.target === modal) closeFn(); };
 
-        form.onsubmit = e => {
+        form.onsubmit = async e => {
             e.preventDefault();
-            const d = Object.fromEntries(new FormData(form).entries());
-            if (d.id) { DB.Drivers.update(d); Utils.toast('Driver updated', 'success'); }
-            else { d.id = Utils.id(); DB.Drivers.add(d); Utils.toast('Driver added', 'success'); }
-            closeFn();
-            DriverModule.render();
-            window.App && App.updateAlerts();
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.textContent = 'Saving...';
+            try {
+                const d = Object.fromEntries(new FormData(form).entries());
+                const fileInput = document.getElementById('driverLicenseFile');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const dataUrl = await Utils.fileToDataURL(file);
+                    const attId = 'att_' + Utils.id();
+                    await DB.Attachments.save(attId, dataUrl, file.type);
+                    d.license_attachment_id = attId;
+                }
+                
+                if (d.id) { DB.Drivers.update(d); Utils.toast('Driver updated', 'success'); }
+                else { d.id = Utils.id(); DB.Drivers.add(d); Utils.toast('Driver added', 'success'); }
+                
+                closeFn(); DriverModule.render(); window.App && App.updateAlerts();
+            } catch (err) {
+                console.error(err); Utils.toast('Failed to save', 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Save Driver';
+            }
         };
 
         document.querySelectorAll('[data-edit]').forEach(btn => {
@@ -218,8 +242,20 @@ export const DriverModule = {
                 const d = DB.Drivers.getById(btn.dataset.edit);
                 if (!d) return;
                 document.getElementById('driverModalTitle').textContent = 'Edit Driver';
+                form.reset();
                 Object.entries(d).forEach(([k,v]) => { if (form.elements[k]) form.elements[k].value = v ?? ''; });
+                document.getElementById('driverLicenseInfo').innerHTML = d.license_attachment_id 
+                    ? `<span style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg> File attached</span>` 
+                    : '';
                 openFn();
+            };
+        });
+
+        document.querySelectorAll('[data-view-att]').forEach(btn => {
+            btn.onclick = async () => {
+                const att = await DB.Attachments.get(btn.dataset.viewAtt);
+                if (att) Utils.viewAttachment(att.dataUrl, att.type);
+                else Utils.toast('Attachment not found', 'error');
             };
         });
 

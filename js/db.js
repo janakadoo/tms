@@ -169,6 +169,12 @@ export const DB = {
         try { DB._db.run(`ALTER TABLE maintenance ADD COLUMN odometer REAL DEFAULT 0`); } catch(e) {}
         try { DB._db.run(`ALTER TABLE maintenance ADD COLUMN workshop TEXT DEFAULT ''`); } catch(e) {}
         try { DB._db.run(`UPDATE maintenance SET workshop = garage WHERE workshop = '' AND garage IS NOT NULL`); } catch(e) {}
+
+        // Migrate attachments for drivers and vehicles
+        try { DB._db.run(`ALTER TABLE drivers ADD COLUMN license_attachment_id TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE vehicles ADD COLUMN insurance_attachment_id TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE vehicles ADD COLUMN revenue_attachment_id TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE vehicles ADD COLUMN eco_attachment_id TEXT DEFAULT ''`); } catch(e) {}
     },
 
     _createSchema() {
@@ -180,7 +186,9 @@ export const DB = {
                 fuel_type TEXT, engine_no TEXT, chassis_no TEXT,
                 status TEXT DEFAULT 'Active', insurance_expiry TEXT,
                 road_tax_expiry TEXT, tracking_id TEXT, tracking_password TEXT,
-                odometer REAL DEFAULT 0, notes TEXT, created_at TEXT DEFAULT (datetime('now'))
+                odometer REAL DEFAULT 0, notes TEXT, 
+                insurance_attachment_id TEXT DEFAULT '', revenue_attachment_id TEXT DEFAULT '', eco_attachment_id TEXT DEFAULT '',
+                created_at TEXT DEFAULT (datetime('now'))
             )`);
         DB._db.run(`
             CREATE TABLE IF NOT EXISTS drivers (
@@ -188,7 +196,9 @@ export const DB = {
                 license_expiry TEXT, contact TEXT, email TEXT, address TEXT,
                 status TEXT DEFAULT 'Active', joined_date TEXT,
                 emergency_contact TEXT, blood_group TEXT,
-                rating REAL DEFAULT 5, notes TEXT, created_at TEXT DEFAULT (datetime('now'))
+                rating REAL DEFAULT 5, notes TEXT, 
+                license_attachment_id TEXT DEFAULT '',
+                created_at TEXT DEFAULT (datetime('now'))
             )`);
         DB._db.run(`
             CREATE TABLE IF NOT EXISTS customers (

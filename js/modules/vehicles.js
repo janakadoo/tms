@@ -190,6 +190,24 @@ export const VehicleModule = {
                             <label class="form-label">Notes</label>
                             <textarea name="notes" class="form-textarea" placeholder="Additional notes..."></textarea>
                         </div>
+                        <div class="form-group" style="padding-top:0.5rem; border-top:1px solid var(--border-light)">
+                            <label class="form-label">Insurance Card Copy</label>
+                            <input type="file" id="vehInsuranceFile" class="form-input" accept="image/jpeg, image/png, application/pdf">
+                            <input type="hidden" name="insurance_attachment_id" id="vehInsuranceId">
+                            <div id="vehInsuranceInfo" style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-muted)"></div>
+                        </div>
+                        <div class="form-group" style="padding-top:0.5rem; border-top:1px solid var(--border-light)">
+                            <label class="form-label">Revenue License Copy</label>
+                            <input type="file" id="vehRevenueFile" class="form-input" accept="image/jpeg, image/png, application/pdf">
+                            <input type="hidden" name="revenue_attachment_id" id="vehRevenueId">
+                            <div id="vehRevenueInfo" style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-muted)"></div>
+                        </div>
+                        <div class="form-group" style="padding-top:0.5rem; border-top:1px solid var(--border-light)">
+                            <label class="form-label">Eco Test Report</label>
+                            <input type="file" id="vehEcoFile" class="form-input" accept="image/jpeg, image/png, application/pdf">
+                            <input type="hidden" name="eco_attachment_id" id="vehEcoId">
+                            <div id="vehEcoInfo" style="margin-top:0.5rem;font-size:0.875rem;color:var(--text-muted)"></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" id="vehicleModalCancel">Cancel</button>
@@ -223,6 +241,9 @@ export const VehicleModule = {
                 <td>${v.trip_count || 0}</td>
                 <td>
                     <div class="table-actions">
+                        ${v.insurance_attachment_id ? `<button class="btn-icon" data-view-att="${v.insurance_attachment_id}" title="View Insurance" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg></button>` : ''}
+                        ${v.revenue_attachment_id ? `<button class="btn-icon" data-view-att="${v.revenue_attachment_id}" title="View Revenue License" style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></button>` : ''}
+                        ${v.eco_attachment_id ? `<button class="btn-icon" data-view-att="${v.eco_attachment_id}" title="View Eco Test" style="color:var(--success)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg></button>` : ''}
                         ${v.tracking_id && v.tracking_password ? `
                         <button class="btn-icon" title="Track Vehicle" onclick="window.open('https://en.aika168.com/?vms_id=${encodeURIComponent(v.tracking_id)}&vms_pwd=${encodeURIComponent(v.tracking_password)}', 'Tracker_${v.id}', 'width=1000,height=700')">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="color:var(--cyan)"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
@@ -248,26 +269,45 @@ export const VehicleModule = {
         document.getElementById('addVehicleBtn').onclick = () => {
             document.getElementById('vehicleModalTitle').textContent = 'Add Vehicle';
             form.reset(); form.elements['id'].value = '';
+            document.getElementById('vehInsuranceInfo').innerHTML = '';
+            document.getElementById('vehRevenueInfo').innerHTML = '';
+            document.getElementById('vehEcoInfo').innerHTML = '';
             openFn();
         };
         document.getElementById('vehicleModalClose').onclick  = closeFn;
         document.getElementById('vehicleModalCancel').onclick = closeFn;
         modal.onclick = e => { if (e.target === modal) closeFn(); };
 
-        form.onsubmit = e => {
+        form.onsubmit = async e => {
             e.preventDefault();
-            const d = Object.fromEntries(new FormData(form).entries());
-            if (d.id) {
-                DB.Vehicles.update(d);
-                Utils.toast('Vehicle updated successfully', 'success');
-            } else {
-                d.id = Utils.id();
-                DB.Vehicles.add(d);
-                Utils.toast('Vehicle added successfully', 'success');
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.textContent = 'Saving...';
+            try {
+                const d = Object.fromEntries(new FormData(form).entries());
+                
+                const processFile = async (inputId, hiddenId) => {
+                    const input = document.getElementById(inputId);
+                    if (input.files.length > 0) {
+                        const dataUrl = await Utils.fileToDataURL(input.files[0]);
+                        const attId = 'att_' + Utils.id();
+                        await DB.Attachments.save(attId, dataUrl, input.files[0].type);
+                        d[hiddenId] = attId;
+                    }
+                };
+                
+                await processFile('vehInsuranceFile', 'insurance_attachment_id');
+                await processFile('vehRevenueFile', 'revenue_attachment_id');
+                await processFile('vehEcoFile', 'eco_attachment_id');
+                
+                if (d.id) { DB.Vehicles.update(d); Utils.toast('Vehicle updated', 'success'); }
+                else { d.id = Utils.id(); DB.Vehicles.add(d); Utils.toast('Vehicle added', 'success'); }
+                
+                closeFn(); VehicleModule.render(); window.App && App.updateAlerts();
+            } catch (err) {
+                console.error(err); Utils.toast('Failed to save', 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Save Vehicle';
             }
-            closeFn();
-            VehicleModule.render();
-            window.App && App.updateAlerts();
         };
 
         document.querySelectorAll('[data-edit]').forEach(btn => {
@@ -275,8 +315,23 @@ export const VehicleModule = {
                 const v = DB.Vehicles.getById(btn.dataset.edit);
                 if (!v) return;
                 document.getElementById('vehicleModalTitle').textContent = 'Edit Vehicle';
+                form.reset();
                 Object.entries(v).forEach(([k,val]) => { if (form.elements[k]) form.elements[k].value = val ?? ''; });
+                
+                const fileHtml = `<span style="color:var(--info)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg> File attached</span>`;
+                document.getElementById('vehInsuranceInfo').innerHTML = v.insurance_attachment_id ? fileHtml : '';
+                document.getElementById('vehRevenueInfo').innerHTML   = v.revenue_attachment_id ? fileHtml : '';
+                document.getElementById('vehEcoInfo').innerHTML       = v.eco_attachment_id ? fileHtml : '';
+                
                 openFn();
+            };
+        });
+        
+        document.querySelectorAll('[data-view-att]').forEach(btn => {
+            btn.onclick = async () => {
+                const att = await DB.Attachments.get(btn.dataset.viewAtt);
+                if (att) Utils.viewAttachment(att.dataUrl, att.type);
+                else Utils.toast('Attachment not found', 'error');
             };
         });
 
