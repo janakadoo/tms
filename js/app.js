@@ -1,19 +1,19 @@
 /* ================================================================
    TMS | APP.JS — Main Application Controller + Dashboard
    ================================================================ */
-import { DB }    from './db.js?v=1.1';
-import { Utils } from './utils.js?v=1.1';
+import { DB }    from './db.js';
+import { Utils } from './utils.js';
 
-import { VehicleModule }       from './modules/vehicles.js?v=1.1';
-import { DriverModule }        from './modules/drivers.js?v=1.1';
-import { TripModule }          from './modules/trips.js?v=1.1';
-import { FuelModule }          from './modules/fuel.js?v=1.1';
-import { ExpenseModule }       from './modules/expenses.js?v=1.1';
-import { MaintenanceModule }   from './modules/maintenance.js?v=1.1';
-import { ReportsModule }       from './modules/reports.js?v=1.1';
-import { NotificationsModule } from './modules/notifications.js?v=1.1';
-import { SettingsModule }      from './modules/settings.js?v=1.1';
-import { TrackingModule }      from './modules/tracking.js?v=1.1';
+import { VehicleModule }       from './modules/vehicles.js';
+import { DriverModule }        from './modules/drivers.js';
+import { TripModule }          from './modules/trips.js';
+import { FuelModule }          from './modules/fuel.js';
+import { ExpenseModule }       from './modules/expenses.js';
+import { MaintenanceModule }   from './modules/maintenance.js';
+import { ReportsModule }       from './modules/reports.js';
+import { NotificationsModule } from './modules/notifications.js';
+import { SettingsModule }      from './modules/settings.js';
+import { TrackingModule }      from './modules/tracking.js';
 
 let _dashCharts = {};
 
