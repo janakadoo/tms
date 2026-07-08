@@ -163,6 +163,8 @@ export const DB = {
         // Migrate expenses from v2 to v3 schema
         try { DB._db.run(`ALTER TABLE expenses ADD COLUMN trip_id TEXT DEFAULT ''`); } catch(e) {}
         try { DB._db.run(`ALTER TABLE expenses ADD COLUMN description TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE expenses ADD COLUMN title TEXT DEFAULT ''`); } catch(e) {}
+        try { DB._db.run(`ALTER TABLE expenses ADD COLUMN payment_method TEXT DEFAULT ''`); } catch(e) {}
         try { DB._db.run(`UPDATE expenses SET description = title WHERE description = '' AND title IS NOT NULL`); } catch(e) {}
 
         // Migrate maintenance from v2 to v3 schema
@@ -231,8 +233,9 @@ export const DB = {
         DB._db.run(`
             CREATE TABLE IF NOT EXISTS expenses (
                 id TEXT PRIMARY KEY, trip_id TEXT DEFAULT '', vehicle_id TEXT,
-                date TEXT, category TEXT, amount REAL, description TEXT,
-                receipt_no TEXT, attachment_id TEXT DEFAULT '',
+                date TEXT, category TEXT, title TEXT DEFAULT '', amount REAL,
+                description TEXT, receipt_no TEXT, payment_method TEXT DEFAULT '',
+                attachment_id TEXT DEFAULT '',
                 created_at TEXT DEFAULT (datetime('now'))
             )`);
         DB._db.run(`
@@ -372,10 +375,10 @@ export const DB = {
             LEFT JOIN vehicles v ON e.vehicle_id = v.id
             ORDER BY e.date DESC`),
         getById: id => DB.select('SELECT * FROM expenses WHERE id=?', [id])[0],
-        add: e => DB.run(`INSERT INTO expenses (id,trip_id,vehicle_id,date,category,amount,description,receipt_no,attachment_id) VALUES (?,?,?,?,?,?,?,?,?)`,
-            [e.id,e.trip_id||'',e.vehicle_id,e.date,e.category,e.amount,e.description,e.receipt_no,e.attachment_id||'']),
-        update: e => DB.run(`UPDATE expenses SET trip_id=?,vehicle_id=?,date=?,category=?,amount=?,description=?,receipt_no=?,attachment_id=? WHERE id=?`,
-            [e.trip_id||'',e.vehicle_id,e.date,e.category,e.amount,e.description,e.receipt_no,e.attachment_id||'',e.id]),
+        add: e => DB.run(`INSERT INTO expenses (id,trip_id,vehicle_id,date,category,title,amount,description,receipt_no,payment_method,attachment_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+            [e.id,e.trip_id||'',e.vehicle_id||'',e.date,e.category,e.title||'',e.amount,e.description||'',e.receipt_no||'',e.payment_method||'',e.attachment_id||'']),
+        update: e => DB.run(`UPDATE expenses SET trip_id=?,vehicle_id=?,date=?,category=?,title=?,amount=?,description=?,receipt_no=?,payment_method=?,attachment_id=? WHERE id=?`,
+            [e.trip_id||'',e.vehicle_id||'',e.date,e.category,e.title||'',e.amount,e.description||'',e.receipt_no||'',e.payment_method||'',e.attachment_id||'',e.id]),
         delete: id => DB.run('DELETE FROM expenses WHERE id=?',[id]),
     },
 
