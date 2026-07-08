@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | EXPENSES MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=2';
-import { Utils } from '../utils.js?v=2';
+import { DB }    from '../db.js?v=3';
+import { Utils } from '../utils.js?v=3';
 
 const EXPENSE_CATS = ['Fuel','Toll','Insurance','Maintenance','Repair','Tyres','Parking','Licence','Fine','Salary','Other'];
 const CAT_COLORS   = ['#6366f1','#06b6d4','#8b5cf6','#10b981','#f59e0b','#f43f5e','#0ea5e9','#ec4899','#14b8a6','#84cc16','#94a3b8'];

@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | CUSTOMERS MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=2';
-import { Utils } from '../utils.js?v=2';
+import { DB }    from '../db.js?v=3';
+import { Utils } from '../utils.js?v=3';
 
 export const CustomerModule = {
     _container: null,

@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | MAINTENANCE MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=2';
-import { Utils } from '../utils.js?v=2';
+import { DB }    from '../db.js?v=3';
+import { Utils } from '../utils.js?v=3';
 
 const MAINT_TYPES = ['Routine Service','Oil Change','Tyre Rotation','Tyre Replacement','Brake Service','Engine Repair','Electrical','Body Work','AC Service','Major Overhaul','Other'];
 
