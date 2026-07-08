@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | ROUTES MODULE
    ================================================================ */
-import { DB }    from '../db.js';
-import { Utils } from '../utils.js';
+import { DB }    from '../db.js?v=2';
+import { Utils } from '../utils.js?v=2';
 
 export const RouteModule = {
     _container: null,
