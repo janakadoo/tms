@@ -321,6 +321,7 @@ export const DB = {
     /* ── ROUTES ──────────────────────────────────────────────── */
     Routes: {
         getAll: () => DB.select('SELECT * FROM routes ORDER BY name'),
+        getById: id => DB.select('SELECT * FROM routes WHERE id=?',[id])[0],
         add: r => DB.run(`INSERT INTO routes (id,name,origin,destination,distance_km,estimated_duration,notes) VALUES (?,?,?,?,?,?,?)`,
             [r.id,r.name,r.origin,r.destination,r.distance_km,r.estimated_duration,r.notes]),
         update: r => DB.run(`UPDATE routes SET name=?,origin=?,destination=?,distance_km=?,estimated_duration=?,notes=? WHERE id=?`,
@@ -370,6 +371,7 @@ export const DB = {
             FROM expenses e
             LEFT JOIN vehicles v ON e.vehicle_id = v.id
             ORDER BY e.date DESC`),
+        getById: id => DB.select('SELECT * FROM expenses WHERE id=?', [id])[0],
         add: e => DB.run(`INSERT INTO expenses (id,trip_id,vehicle_id,date,category,amount,description,receipt_no,attachment_id) VALUES (?,?,?,?,?,?,?,?,?)`,
             [e.id,e.trip_id||'',e.vehicle_id,e.date,e.category,e.amount,e.description,e.receipt_no,e.attachment_id||'']),
         update: e => DB.run(`UPDATE expenses SET trip_id=?,vehicle_id=?,date=?,category=?,amount=?,description=?,receipt_no=?,attachment_id=? WHERE id=?`,
@@ -384,6 +386,7 @@ export const DB = {
             FROM maintenance m
             LEFT JOIN vehicles v ON m.vehicle_id = v.id
             ORDER BY m.date DESC`),
+        getById: id => DB.select('SELECT * FROM maintenance WHERE id=?', [id])[0],
         add: m => DB.run(`INSERT INTO maintenance (id,vehicle_id,date,type,odometer,cost,workshop,description,next_due_date,next_due_km,status,attachment_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
             [m.id, m.vehicle_id, m.date||'', m.type||'', m.odometer||0, m.cost||0, m.workshop||m.garage||'', m.description||'', m.next_due_date||'', m.next_due_km||0, m.status||'Completed', m.attachment_id||'']),
         update: m => DB.run(`UPDATE maintenance SET vehicle_id=?,date=?,type=?,odometer=?,cost=?,workshop=?,description=?,next_due_date=?,next_due_km=?,status=?,attachment_id=? WHERE id=?`,
