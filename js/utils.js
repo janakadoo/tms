@@ -199,8 +199,33 @@ export const Utils = {
     /* ── ATTACHMENTS ────────────────────────────────────────── */
     fileToDataURL(file) {
         return new Promise((resolve, reject) => {
+            // PDFs: pass through as-is
+            if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = e => reject(e);
+                reader.readAsDataURL(file);
+                return;
+            }
+            // Images: compress using canvas (max 1200px, 75% quality)
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const MAX = 1200;
+                    let w = img.width, h = img.height;
+                    if (w > MAX || h > MAX) {
+                        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                        else       { w = Math.round(w * MAX / h); h = MAX; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.onerror = reject;
+                img.src = ev.target.result;
+            };
             reader.onerror = e => reject(e);
             reader.readAsDataURL(file);
         });
