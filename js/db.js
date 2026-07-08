@@ -515,7 +515,15 @@ export const DB = {
             return new Promise((res, rej) => {
                 const tx  = DB.Attachments._db.transaction('files', 'readwrite');
                 const req = tx.objectStore('files').put({ id, dataUrl, type });
-                req.onsuccess = () => res();
+                req.onsuccess = async () => {
+                    if (window.firebase && window.firebase.auth().currentUser) {
+                        try {
+                            const uid = window.firebase.auth().currentUser.uid;
+                            await window.firebase.database().ref(`tms_database/users/${uid}/attachments/${id}`).set({ dataUrl, type });
+                        } catch(e) { console.error('FB Att save error', e); }
+                    }
+                    res();
+                };
                 req.onerror   = e  => rej(e);
             });
         },
@@ -523,8 +531,19 @@ export const DB = {
             return new Promise((res, rej) => {
                 const tx  = DB.Attachments._db.transaction('files', 'readonly');
                 const req = tx.objectStore('files').get(id);
-                req.onsuccess = e  => {
-                    const r = e.target.result;
+                req.onsuccess = async e  => {
+                    let r = e.target.result;
+                    if (!r && window.firebase && window.firebase.auth().currentUser) {
+                        try {
+                            const uid = window.firebase.auth().currentUser.uid;
+                            const snap = await window.firebase.database().ref(`tms_database/users/${uid}/attachments/${id}`).once('value');
+                            if (snap.exists()) {
+                                r = snap.val();
+                                const tx2 = DB.Attachments._db.transaction('files', 'readwrite');
+                                tx2.objectStore('files').put({ id: id, dataUrl: r.dataUrl, type: r.type });
+                            }
+                        } catch(err) { console.error('FB Att load error', err); }
+                    }
                     if (!r) return res(null);
                     if (r.blob && !r.dataUrl) {
                         r.dataUrl = r.blob;
@@ -540,7 +559,15 @@ export const DB = {
             return new Promise((res, rej) => {
                 const tx  = DB.Attachments._db.transaction('files', 'readwrite');
                 const req = tx.objectStore('files').delete(id);
-                req.onsuccess = () => res();
+                req.onsuccess = async () => {
+                    if (window.firebase && window.firebase.auth().currentUser) {
+                        try {
+                            const uid = window.firebase.auth().currentUser.uid;
+                            await window.firebase.database().ref(`tms_database/users/${uid}/attachments/${id}`).remove();
+                        } catch(e) { console.error('FB Att delete error', e); }
+                    }
+                    res();
+                };
                 req.onerror   = e  => rej(e);
             });
         }
