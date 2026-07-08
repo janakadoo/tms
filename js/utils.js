@@ -212,9 +212,10 @@ export const Utils = {
         overlay.style.zIndex = '1300';
         
         let content = '';
-        if (type.startsWith('image/')) {
+        const safeType = type || 'image/jpeg';
+        if (safeType.startsWith('image/')) {
             content = `<img src="${dataUrl}" style="max-width:100%;max-height:80vh;object-fit:contain;border-radius:8px">`;
-        } else if (type === 'application/pdf') {
+        } else if (safeType === 'application/pdf') {
             content = `<iframe src="${dataUrl}" style="width:100%;height:80vh;border:none;border-radius:8px"></iframe>`;
         } else {
             content = `<div style="padding:2rem;text-align:center">Unsupported file type</div>`;
