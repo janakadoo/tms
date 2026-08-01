@@ -385,7 +385,7 @@ export const DB = {
     /* ── MAINTENANCE ─────────────────────────────────────────── */
     Maintenance: {
         getAll: () => DB.select(`
-            SELECT m.*, v.reg_no as vehicle_reg
+            SELECT m.*, v.reg_no, v.brand as vehicle_brand, v.model as vehicle_model
             FROM maintenance m
             LEFT JOIN vehicles v ON m.vehicle_id = v.id
             ORDER BY m.date DESC`),
