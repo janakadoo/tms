@@ -336,7 +336,7 @@ export const DB = {
     Trips: {
         getAll: () => DB.select(`
             SELECT t.*,
-                v.reg_no as vehicle_reg, v.type as vehicle_type,
+                v.reg_no, v.brand as vehicle_brand, v.model as vehicle_model, v.type as vehicle_type,
                 d.name as driver_name
             FROM trips t
             LEFT JOIN vehicles v ON t.vehicle_id = v.id
@@ -353,7 +353,7 @@ export const DB = {
     /* ── FUEL ────────────────────────────────────────────────── */
     Fuel: {
         getAll: () => DB.select(`
-            SELECT f.*, v.reg_no as vehicle_reg, d.name as driver_name
+            SELECT f.*, v.reg_no, v.brand as vehicle_brand, v.model as vehicle_model, d.name as driver_name
             FROM fuel_logs f
             LEFT JOIN vehicles v ON f.vehicle_id = v.id
             LEFT JOIN drivers  d ON f.driver_id  = d.id
@@ -370,7 +370,7 @@ export const DB = {
     /* ── EXPENSES ────────────────────────────────────────────── */
     Expenses: {
         getAll: () => DB.select(`
-            SELECT e.*, v.reg_no as vehicle_reg
+            SELECT e.*, v.reg_no
             FROM expenses e
             LEFT JOIN vehicles v ON e.vehicle_id = v.id
             ORDER BY e.date DESC`),
