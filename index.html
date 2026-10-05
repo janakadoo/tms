@@ -36,6 +36,18 @@
 
     <!-- sql.js (Local SQLite engine) -->
     <script src="lib/sql-wasm.js"></script>
+
+    <!-- Force clear any old service workers causing cache issues -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                    console.log('Unregistered old service worker.');
+                }
+            });
+        }
+    </script>
 </head>
 
 <body class="dark-mode">
@@ -204,6 +216,6 @@
 </div>
 
 <!-- Main App Module -->
-<script type="module" src="js/app.js?v=3"></script>
+<script type="module" src="js/app.js?v=10"></script>
 </body>
 </html>
