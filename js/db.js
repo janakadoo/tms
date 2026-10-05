@@ -342,7 +342,7 @@ export const DB = {
             LEFT JOIN vehicles v ON t.vehicle_id = v.id
             LEFT JOIN drivers  d ON t.driver_id  = d.id
             ORDER BY t.start_date DESC`),
-        getById: id => DB.select('SELECT * FROM trips WHERE id=?',[id])[0],
+        getById: id => DB.select(`SELECT t.*, v.reg_no, d.name as driver_name FROM trips t LEFT JOIN vehicles v ON t.vehicle_id=v.id LEFT JOIN drivers d ON t.driver_id=d.id WHERE t.id=?`,[id])[0],
         add: t => DB.run(`INSERT INTO trips (id,vehicle_id,driver_id,start_date,end_date,purpose,distance_km,start_odometer,end_odometer,status,revenue,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
             [t.id,t.vehicle_id,t.driver_id,t.start_date,t.end_date,t.purpose,t.distance_km,t.start_odometer,t.end_odometer,t.status,t.revenue,t.notes]),
         update: t => DB.run(`UPDATE trips SET vehicle_id=?,driver_id=?,start_date=?,end_date=?,purpose=?,distance_km=?,start_odometer=?,end_odometer=?,status=?,revenue=?,notes=? WHERE id=?`,
@@ -359,7 +359,7 @@ export const DB = {
             LEFT JOIN drivers  d ON f.driver_id  = d.id
             ORDER BY f.date DESC`),
         getByTrip: tripId => DB.select('SELECT * FROM fuel_logs WHERE trip_id=?', [tripId]),
-        getById: id => DB.select('SELECT * FROM fuel_logs WHERE id=?', [id])[0],
+        getById: id => DB.select(`SELECT f.*, v.reg_no, d.name as driver_name FROM fuel_logs f LEFT JOIN vehicles v ON f.vehicle_id=v.id LEFT JOIN drivers d ON f.driver_id=d.id WHERE f.id=?`,[id])[0],
         add: f => DB.run(`INSERT INTO fuel_logs (id,vehicle_id,driver_id,trip_id,fill_phase,date,station,liters,cost_per_liter,total_cost,odometer,full_tank,notes,attachment_id,fill_date,receipt_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [f.id,f.vehicle_id,f.driver_id,f.trip_id||'',f.fill_phase||'general',f.date,f.station,f.liters,f.cost_per_liter||0,f.total_cost,f.odometer,f.full_tank||0,f.notes,f.attachment_id||'',f.fill_date||'',f.receipt_no||'']),
         update: f => DB.run(`UPDATE fuel_logs SET vehicle_id=?,driver_id=?,trip_id=?,fill_phase=?,date=?,station=?,liters=?,cost_per_liter=?,total_cost=?,odometer=?,full_tank=?,notes=?,attachment_id=?,fill_date=?,receipt_no=? WHERE id=?`,
@@ -374,7 +374,7 @@ export const DB = {
             FROM expenses e
             LEFT JOIN vehicles v ON e.vehicle_id = v.id
             ORDER BY e.date DESC`),
-        getById: id => DB.select('SELECT * FROM expenses WHERE id=?', [id])[0],
+        getById: id => DB.select(`SELECT e.*, v.reg_no FROM expenses e LEFT JOIN vehicles v ON e.vehicle_id=v.id WHERE e.id=?`,[id])[0],
         add: e => DB.run(`INSERT INTO expenses (id,trip_id,vehicle_id,date,category,title,amount,description,receipt_no,payment_method,attachment_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
             [e.id,e.trip_id||'',e.vehicle_id||'',e.date,e.category,e.title||'',e.amount,e.description||'',e.receipt_no||'',e.payment_method||'',e.attachment_id||'']),
         update: e => DB.run(`UPDATE expenses SET trip_id=?,vehicle_id=?,date=?,category=?,title=?,amount=?,description=?,receipt_no=?,payment_method=?,attachment_id=? WHERE id=?`,
@@ -389,7 +389,7 @@ export const DB = {
             FROM maintenance m
             LEFT JOIN vehicles v ON m.vehicle_id = v.id
             ORDER BY m.date DESC`),
-        getById: id => DB.select('SELECT * FROM maintenance WHERE id=?', [id])[0],
+        getById: id => DB.select(`SELECT m.*, v.reg_no FROM maintenance m LEFT JOIN vehicles v ON m.vehicle_id=v.id WHERE m.id=?`,[id])[0],
         add: m => DB.run(`INSERT INTO maintenance (id,vehicle_id,date,type,odometer,cost,workshop,description,next_due_date,next_due_km,status,attachment_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
             [m.id, m.vehicle_id, m.date||'', m.type||'', m.odometer||0, m.cost||0, m.workshop||m.garage||'', m.description||'', m.next_due_date||'', m.next_due_km||0, m.status||'Completed', m.attachment_id||'']),
         update: m => DB.run(`UPDATE maintenance SET vehicle_id=?,date=?,type=?,odometer=?,cost=?,workshop=?,description=?,next_due_date=?,next_due_km=?,status=?,attachment_id=? WHERE id=?`,

@@ -267,7 +267,7 @@ export const ReportsModule = {
         })));
         const sheetMaint = XLSX.utils.json_to_sheet(maintData.map(m=>({
             Vehicle: m.reg_no, Type: m.type, Date: m.date,
-            Garage: m.garage, Cost: m.cost, Status: m.status
+            Workshop: m.workshop, Cost: m.cost, Status: m.status
         })));
 
         XLSX.utils.book_append_sheet(wb, sheetTrips,  'Trips');
@@ -380,7 +380,7 @@ export const ReportsModule = {
                     Utils.formatDate(m.date),
                     m.reg_no || '-',
                     m.type || '-',
-                    m.garage || '-',
+                    m.workshop || '-',
                     m.cost || '-',
                     m.status || '-'
                 ]),

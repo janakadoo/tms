@@ -8,6 +8,7 @@ import { VehicleModule }       from './modules/vehicles.js?v=3';
 import { DriverModule }        from './modules/drivers.js?v=3';
 import { TripModule }          from './modules/trips.js?v=3';
 import { FuelModule }          from './modules/fuel.js?v=3';
+import { FuelCalcModule }      from './modules/fuel_calc.js?v=3';
 import { ExpenseModule }       from './modules/expenses.js?v=3';
 import { MaintenanceModule }   from './modules/maintenance.js?v=3';
 import { ReportsModule }       from './modules/reports.js?v=3';
@@ -220,6 +221,7 @@ const PAGE_META = {
     drivers:       { title: 'Driver Management',     sub: 'Manage your drivers' },
     trips:         { title: 'Trip Management',       sub: 'Trips with fuel consumption monitoring' },
     fuel:          { title: 'Fuel Logs',             sub: 'General fuel consumption & costs' },
+    'fuel-calc':   { title: 'Fuel Calculator',       sub: 'Trip fuel consumption analysis' },
     expenses:      { title: 'Expenses',              sub: 'Track all expenses' },
     maintenance:   { title: 'Service & Maintenance', sub: 'Vehicle servicing records' },
     reports:       { title: 'Reports',               sub: 'Analytics & data export' },
@@ -253,6 +255,7 @@ function handleRoute() {
         case 'drivers':       DriverModule.init(content);              break;
         case 'trips':         TripModule.init(content);                break;
         case 'fuel':          FuelModule.init(content);                break;
+        case 'fuel-calc':     FuelCalcModule.init(content);            break;
         case 'expenses':      ExpenseModule.init(content);             break;
         case 'maintenance':   MaintenanceModule.init(content);         break;
         case 'reports':       ReportsModule.init(content);             break;
