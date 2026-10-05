@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | FUEL CALCULATOR MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=11';
-import { Utils } from '../utils.js?v=11';
+import { DB }    from '../db.js?v=12';
+import { Utils } from '../utils.js?v=12';
 
 export const FuelCalcModule = {
     _container: null,
@@ -20,130 +20,128 @@ export const FuelCalcModule = {
             return '<option value="' + v.id + '">' + Utils.esc(v.reg_no) + ' - ' + Utils.esc(v.brand || '') + '</option>';
         }).join('');
 
-        const dOptions = drivers.map(function(d) {
-            return '<option value="' + Utils.esc(d.name) + '">';
-        }).join('');
-
         const sym = DB.Settings.get('currency_symbol') || 'Rs.';
 
         FuelCalcModule._container.innerHTML = [
             '<div class="page-content" id="fuelCalcPage">',
 
-            // Header (hidden on print)
-            '<div class="page-header no-print">',
-            '  <div class="page-header-left">',
-            '    <h2>Fuel Consumption Calculator</h2>',
-            '    <p>Calculate and print accurate consumption reports for trips</p>',
+            // --- SCREEN UI (Hidden on print) ---
+            '<div class="no-print">',
+            '  <div class="page-header">',
+            '    <div class="page-header-left">',
+            '      <h2>Fuel Consumption Calculator</h2>',
+            '      <p>Calculate and print accurate consumption reports for trips</p>',
+            '    </div>',
+            '    <div class="page-header-actions">',
+            '      <button class="btn btn-secondary" id="fcAddRowBtn">',
+            '        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>',
+            '        Add Filling',
+            '      </button>',
+            '      <button class="btn btn-primary" id="fcPrintBtn">',
+            '        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>',
+            '        Print Report',
+            '      </button>',
+            '    </div>',
             '  </div>',
-            '  <div class="page-header-actions">',
-            '    <button class="btn btn-secondary" id="fcAddRowBtn">',
-            '      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>',
-            '      Add Filling',
-            '    </button>',
-            '    <button class="btn btn-primary" id="fcPrintBtn">',
-            '      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>',
-            '      Print Report',
-            '    </button>',
-            '  </div>',
-            '</div>',
 
-            // Print-only header
-            '<div class="print-only" style="text-align:center;border-bottom:2px solid #ccc;padding-bottom:10px;margin-bottom:20px;">',
-            '  <h2>Fuel Consumption Report</h2>',
-            '  <div id="printDate" style="color:#666;margin-bottom:10px;"></div>',
-            '</div>',
-
-            // Trip info card
-            '<div class="card" style="margin-bottom:1.5rem">',
-            '  <div class="card-body">',
-            '    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">',
-            '      <div class="form-group">',
-            '        <label class="form-label">Vehicle</label>',
-            '        <select class="form-select" id="fcVehicle">',
-            '          <option value="">Select Vehicle...</option>',
+            '  <div class="card" style="margin-bottom:1.5rem">',
+            '    <div class="card-body">',
+            '      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">',
+            '        <div class="form-group">',
+            '          <label class="form-label">Vehicle</label>',
+            '          <select class="form-select" id="fcVehicle">',
+            '            <option value="">Select Vehicle...</option>',
             vOptions,
-            '        </select>',
-            '      </div>',
-            '      <div class="form-group">',
-            '        <label class="form-label">Driver Name</label>',
-            '        <input type="text" class="form-input" id="fcDriver" placeholder="Enter Driver Name" list="fcDriversList">',
-            '        <datalist id="fcDriversList">' + dOptions + '</datalist>',
-            '      </div>',
-            '      <div class="form-group">',
-            '        <label class="form-label">Route / Trip Info</label>',
-            '        <input type="text" class="form-input" id="fcRoute" placeholder="e.g. Colombo - Kandy - Colombo">',
-            '      </div>',
-            '      <div class="form-group">',
-            '        <label class="form-label">Start Odometer (km) <small class="no-print text-muted">(Optional)</small></label>',
-            '        <input type="number" class="form-input" id="fcStartOdo" placeholder="e.g. 45000">',
+            '          </select>',
+            '        </div>',
+            '        <div class="form-group">',
+            '          <label class="form-label">Route / Trip Info</label>',
+            '          <input type="text" class="form-input" id="fcRoute" placeholder="e.g. Complete Tour / Real Fuel Data">',
+            '        </div>',
             '      </div>',
             '    </div>',
             '  </div>',
-            '</div>',
 
-            // Fillings table
-            '<div class="card" style="margin-bottom:1.5rem">',
-            '  <div class="table-wrap">',
-            '    <table class="table" id="fcTable">',
-            '      <thead>',
-            '        <tr>',
-            '          <th>Date</th>',
-            '          <th>Amount (L)</th>',
-            '          <th>Station &amp; Cost</th>',
-            '          <th>Odometer (km)</th>',
-            '          <th>Distance (km)</th>',
-            '          <th>Consumption (km/L)</th>',
-            '          <th class="no-print">Action</th>',
-            '        </tr>',
-            '      </thead>',
-            '      <tbody id="fcTbody"></tbody>',
-            '      <tfoot style="background:var(--bg-elevated);font-weight:bold;">',
-            '        <tr>',
-            '          <td colspan="3" style="text-align:right">Total Liters:</td>',
-            '          <td colspan="4"><span id="fcTotalLiters" style="color:var(--amber);font-size:1.1rem">0.0</span> L</td>',
-            '        </tr>',
-            '        <tr>',
-            '          <td colspan="3" style="text-align:right">Total Distance:</td>',
-            '          <td colspan="4"><span id="fcTotalDistance" style="color:var(--cyan);font-size:1.1rem">0</span> km</td>',
-            '        </tr>',
-            '        <tr>',
-            '          <td colspan="3" style="text-align:right">Average Consumption:</td>',
-            '          <td colspan="4"><span id="fcAvgConsumption" style="color:var(--success);font-size:1.2rem">0.00</span> km/L</td>',
-            '        </tr>',
-            '      </tfoot>',
-            '    </table>',
+            '  <div class="card" style="margin-bottom:1.5rem">',
+            '    <div class="table-wrap">',
+            '      <table class="table" id="fcTable">',
+            '        <thead>',
+            '          <tr>',
+            '            <th>Date</th>',
+            '            <th>Amount (L)</th>',
+            '            <th>Total Cost (' + sym + ')</th>',
+            '            <th>Odometer (km)</th>',
+            '            <th style="width:50px"></th>',
+            '          </tr>',
+            '        </thead>',
+            '        <tbody id="fcTbody"></tbody>',
+            '      </table>',
+            '    </div>',
+            '  </div>',
+            '  <div style="padding:1rem;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.2);color:var(--emerald)">',
+            '    <strong>Tip:</strong> The first row is treated as the starting baseline. Subsequent fills are used to calculate the tour consumption.',
             '  </div>',
             '</div>',
 
-            // Signatures
-            '<div style="margin-top:3rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;">',
-            '  <div class="form-group" style="min-width:220px">',
-            '    <label class="form-label">Prepared By</label>',
-            '    <input type="text" class="form-input" id="fcPreparedBy" placeholder="Enter Name">',
-            '    <div class="print-only" style="border-top:1px solid #333;margin-top:40px;text-align:center;padding-top:5px;">Signature</div>',
+            // --- PRINT UI (Hidden on screen) ---
+            '<div class="print-only" id="printReport">',
+            '  <div style="text-align:center;margin-bottom:30px;">',
+            '    <h1 style="margin:0;font-size:24px;text-transform:uppercase;">VEHICLE FUEL CONSUMPTION REPORT</h1>',
+            '    <p style="margin:5px 0 0 0;font-size:16px;color:#555;">Vehicle No. <span id="prReg" style="font-weight:bold">--</span> — <span id="prRoute">--</span></p>',
             '  </div>',
-            '  <div class="form-group print-only" style="min-width:220px">',
-            '    <div style="border-top:1px solid #333;margin-top:68px;text-align:center;padding-top:5px;">Approved By</div>',
-            '  </div>',
-            '</div>',
 
-            // Tip box
-            '<div class="no-print" style="margin-top:2rem;padding:1rem;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.2);color:var(--emerald)">',
-            '  <strong>Tip:</strong> Select a vehicle &amp; date to auto-fill Station, Cost &amp; Odometer from your Fuel Logs. Then it calculates km/L automatically!',
+            '  <table style="width:100%;max-width:600px;margin:0 auto 30px auto;border-collapse:collapse;font-size:14px;">',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold;width:50%">Start Mileage</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prStartOdo">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Final Mileage</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prEndOdo">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Total Distance</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prTotalDist">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Total Fuel Used</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prTotalFuel">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Total Fuel Cost</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prTotalCost">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Overall Consumption</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prKml">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Consumption</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prL100km">--</td></tr>',
+            '    <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">Fuel Cost per Km</td><td style="padding:8px;border:1px solid #ddd;text-align:right" id="prCostPerKm">--</td></tr>',
+            '  </table>',
+
+            '  <h3 style="margin-bottom:10px;font-size:18px;">Fuel Filling &amp; Section Consumption</h3>',
+            '  <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:30px;">',
+            '    <thead>',
+            '      <tr style="background-color:#2a364b;color:#fff;">',
+            '        <th style="padding:8px;border:1px solid #555;text-align:left">Date</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Mileage</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Fuel Amount</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Price/L</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Litres</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Distance</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Km/L</th>',
+            '        <th style="padding:8px;border:1px solid #555;text-align:right">Rs/km</th>',
+            '      </tr>',
+            '    </thead>',
+            '    <tbody id="prTbody">',
+            '    </tbody>',
+            '  </table>',
+
+            '  <div style="font-size:14px;line-height:1.6;">',
+            '    <h3 style="margin-bottom:10px;font-size:18px;">Complete Tour Calculation</h3>',
+            '    <p style="margin:0">• Distance travelled = <span id="prCalcDist">--</span></p>',
+            '    <p style="margin:0">• Fuel used after starting fill = <strong id="prCalcFuel">--</strong></p>',
+            '    <p style="margin:0">• Overall consumption = <span id="prCalcCons">--</span></p>',
+            '    <p style="margin:0">• Equivalent consumption = <strong id="prCalcL100">--</strong></p>',
+            '    <p style="margin:0">• Fuel cost for tour = <strong id="prCalcCost">--</strong></p>',
+            '    <p style="margin:0">• Average fuel cost = <strong id="prCalcAvgCost">--</strong></p>',
+            '    <p style="margin-top:20px;font-size:11px;color:#777;" id="prNotes">Note: Each fuel filling uses its actual fuel price. The starting fill is treated as baseline, subsequent fills are used to calculate tour consumption.</p>',
+            '  </div>',
             '</div>',
 
             // Print styles
             '<style>',
+            '@media screen {',
+            '  .print-only { display: none !important; }',
+            '}',
             '@media print {',
-            '  @page { margin:15mm; }',
+            '  @page { margin:20mm; }',
             '  body * { visibility:hidden; }',
             '  #fuelCalcPage, #fuelCalcPage * { visibility:visible; }',
-            '  #fuelCalcPage { position:absolute;left:0;top:0;width:100%; }',
+            '  #fuelCalcPage { position:absolute;left:0;top:0;width:100%;color:#000;background:#fff; }',
             '  .no-print { display:none !important; }',
-            '  .table { color:#000 !important; }',
-            '  .table th { background:#f0f0f0 !important;color:#000 !important;-webkit-print-color-adjust:exact;border-bottom:1px solid #000; }',
-            '  .table td { border-bottom:1px solid #ddd; }',
-            '  input.form-input,select.form-select { border:none;background:transparent;padding:0;color:#000;font-weight:bold; }',
             '}',
             '</style>',
 
@@ -152,22 +150,27 @@ export const FuelCalcModule = {
 
         FuelCalcModule._bindEvents();
         FuelCalcModule._addRow();
+        FuelCalcModule._addRow(); // Start with at least 2 rows for baseline and end
     },
 
     _bindEvents() {
         var addBtn   = document.getElementById('fcAddRowBtn');
         var printBtn = document.getElementById('fcPrintBtn');
-        var startOdo = document.getElementById('fcStartOdo');
         var vehicle  = document.getElementById('fcVehicle');
+        var route    = document.getElementById('fcRoute');
 
         if (addBtn)   addBtn.addEventListener('click',  function() { FuelCalcModule._addRow(); });
         if (printBtn) printBtn.addEventListener('click', function() {
-            var d = document.getElementById('printDate');
-            if (d) d.textContent = 'Generated on: ' + new Date().toLocaleDateString('en-GB');
+            FuelCalcModule._calculateAll(); // Update print view before printing
             window.print();
         });
-        if (startOdo) startOdo.addEventListener('input', function() { FuelCalcModule._calculateAll(); });
-        if (vehicle)  vehicle.addEventListener('change', function() { FuelCalcModule._triggerAutoFillAll(); });
+        if (vehicle)  vehicle.addEventListener('change', function() { 
+            FuelCalcModule._triggerAutoFillAll(); 
+            document.getElementById('prReg').textContent = vehicle.options[vehicle.selectedIndex].text.split(' - ')[0] || '--';
+        });
+        if (route) route.addEventListener('input', function() {
+            document.getElementById('prRoute').textContent = route.value || 'Complete Tour / Real Fuel Data';
+        });
     },
 
     _addRow() {
@@ -177,15 +180,10 @@ export const FuelCalcModule = {
         var tr = document.createElement('tr');
         tr.innerHTML = [
             '<td><input type="date" class="form-input fc-date" style="min-width:120px"></td>',
-            '<td><input type="number" class="form-input fc-amount" step="0.1" placeholder="e.g. 20" style="min-width:80px"></td>',
-            '<td>',
-            '  <div class="fc-station" style="font-size:0.9rem;color:var(--text-secondary)">--</div>',
-            '  <div class="fc-cost" style="font-size:0.8rem;color:var(--text-muted)">--</div>',
-            '</td>',
-            '<td><input type="number" class="form-input fc-odo" placeholder="Odometer" style="min-width:100px"></td>',
-            '<td><span class="fc-dist" style="font-weight:600">--</span></td>',
-            '<td><span class="fc-cons badge badge-neutral">--</span></td>',
-            '<td class="no-print">',
+            '<td><input type="number" class="form-input fc-amount" step="0.1" placeholder="Liters"></td>',
+            '<td><input type="number" class="form-input fc-cost" step="0.01" placeholder="Cost"></td>',
+            '<td><input type="number" class="form-input fc-odo" placeholder="Odometer"></td>',
+            '<td class="no-print" style="text-align:right">',
             '  <button class="btn-icon danger fc-del-btn" title="Remove">',
             '    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>',
             '  </button>',
@@ -194,15 +192,17 @@ export const FuelCalcModule = {
 
         tbody.appendChild(tr);
 
-        var dateInp = tr.querySelector('.fc-date');
-        var amtInp  = tr.querySelector('.fc-amount');
-        var odoInp  = tr.querySelector('.fc-odo');
-        var delBtn  = tr.querySelector('.fc-del-btn');
+        var inputs = tr.querySelectorAll('input');
+        inputs.forEach(function(inp) {
+            inp.addEventListener('change', function() { FuelCalcModule._autoFillRow(tr); });
+            inp.addEventListener('input',  function() { FuelCalcModule._calculateAll(); });
+        });
 
-        dateInp.addEventListener('change', function() { FuelCalcModule._autoFillRow(tr); });
-        amtInp.addEventListener('input',   function() { FuelCalcModule._autoFillRow(tr); });
-        odoInp.addEventListener('input',   function() { FuelCalcModule._calculateAll(); });
-        delBtn.addEventListener('click',   function() { tr.remove(); FuelCalcModule._calculateAll(); });
+        var delBtn = tr.querySelector('.fc-del-btn');
+        delBtn.addEventListener('click', function() { 
+            tr.remove(); 
+            FuelCalcModule._calculateAll(); 
+        });
     },
 
     _triggerAutoFillAll() {
@@ -213,7 +213,9 @@ export const FuelCalcModule = {
     _autoFillRow(tr) {
         var vid  = document.getElementById('fcVehicle').value;
         var date = tr.querySelector('.fc-date').value;
-        var amt  = parseFloat(tr.querySelector('.fc-amount').value);
+        var amtInp  = tr.querySelector('.fc-amount');
+        var costInp = tr.querySelector('.fc-cost');
+        var odoInp  = tr.querySelector('.fc-odo');
 
         if (!vid || !date) return;
 
@@ -221,78 +223,137 @@ export const FuelCalcModule = {
             return String(f.vehicle_id) === String(vid) && f.date === date;
         });
 
-        var match = null;
-        if (logs.length === 1) {
-            match = logs[0];
-        } else if (logs.length > 1) {
-            if (!isNaN(amt)) {
+        if (logs.length > 0) {
+            var amt = parseFloat(amtInp.value);
+            var match = logs[0];
+            if (logs.length > 1 && !isNaN(amt)) {
                 match = logs.reduce(function(prev, curr) {
                     return Math.abs(parseFloat(curr.liters) - amt) < Math.abs(parseFloat(prev.liters) - amt) ? curr : prev;
                 });
-            } else {
-                match = logs[0];
             }
-        }
 
-        if (match) {
-            var sym = DB.Settings.get('currency_symbol') || 'Rs.';
-            tr.querySelector('.fc-station').textContent = match.station || 'Unknown Station';
-            tr.querySelector('.fc-cost').textContent    = (match.total_cost > 0) ? sym + ' ' + parseFloat(match.total_cost).toFixed(2) : '--';
-
-            var odoInp = tr.querySelector('.fc-odo');
-            if (!odoInp.value && match.odometer) odoInp.value = match.odometer;
-
-            var amtInp = tr.querySelector('.fc-amount');
-            if (!amtInp.value && match.liters) amtInp.value = match.liters;
+            if (!costInp.value && match.total_cost) costInp.value = match.total_cost;
+            if (!odoInp.value && match.odometer)    odoInp.value = match.odometer;
+            if (!amtInp.value && match.liters)      amtInp.value = match.liters;
         }
 
         FuelCalcModule._calculateAll();
     },
 
     _calculateAll() {
-        var rows     = Array.from(document.querySelectorAll('#fcTbody tr'));
-        var startOdo = parseFloat(document.getElementById('fcStartOdo').value) || 0;
+        var rows = Array.from(document.querySelectorAll('#fcTbody tr'));
+        var prTbody = document.getElementById('prTbody');
+        if (!prTbody) return;
+        prTbody.innerHTML = '';
 
-        var totalLiters   = 0;
-        var totalDistance = 0;
-        var previousOdo   = startOdo;
+        var sym = DB.Settings.get('currency_symbol') || 'Rs.';
+        var fmt = function(n, d) { return Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: d||0, maximumFractionDigits: d||0}); };
 
-        rows.forEach(function(tr) {
+        var startOdo = 0;
+        var endOdo = 0;
+        var totalFuelUsed = 0;
+        var totalFuelCost = 0;
+        
+        var previousOdo = 0;
+        var firstDate = '';
+        var firstPrice = 0;
+
+        var notePrices = [];
+
+        rows.forEach(function(tr, idx) {
+            var date = tr.querySelector('.fc-date').value || '--';
             var amt  = parseFloat(tr.querySelector('.fc-amount').value) || 0;
-            var odo  = parseFloat(tr.querySelector('.fc-odo').value)    || 0;
-            var distSpan = tr.querySelector('.fc-dist');
-            var consSpan = tr.querySelector('.fc-cons');
+            var cost = parseFloat(tr.querySelector('.fc-cost').value) || 0;
+            var odo  = parseFloat(tr.querySelector('.fc-odo').value) || 0;
+            
+            var pricePerL = amt > 0 ? (cost / amt) : 0;
+            
+            if (idx === 0) {
+                // Baseline row
+                startOdo = odo;
+                previousOdo = odo;
+                firstDate = date;
+                firstPrice = pricePerL;
 
-            totalLiters += amt;
-
-            if (odo > 0 && previousOdo > 0 && odo > previousOdo) {
-                var dist = odo - previousOdo;
-                totalDistance += dist;
-                distSpan.textContent = dist.toFixed(1) + ' km';
-                distSpan.style.color = 'var(--text-primary)';
-
-                if (amt > 0) {
-                    var kml = (dist / amt).toFixed(2);
-                    consSpan.textContent = kml + ' km/L';
-                    consSpan.className   = 'fc-cons badge ' + (kml >= 8 ? 'badge-success' : kml >= 5 ? 'badge-primary' : 'badge-warning');
-                } else {
-                    consSpan.textContent = '--';
-                    consSpan.className   = 'fc-cons badge badge-neutral';
+                if(date !== '--' && pricePerL > 0) {
+                    notePrices.push(sym + ' ' + Math.round(pricePerL) + '/L on ' + date);
                 }
+                
+                prTbody.innerHTML += [
+                    '<tr>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:left">' + date + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + fmt(odo) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + sym + ' ' + fmt(cost) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + sym + ' ' + Math.round(pricePerL) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + fmt(amt, 2) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">Starting</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">--</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">--</td>',
+                    '</tr>'
+                ].join('');
             } else {
-                distSpan.textContent = '--';
-                distSpan.style.color = 'var(--text-muted)';
-                consSpan.textContent = '--';
-                consSpan.className   = 'fc-cons badge badge-neutral';
-            }
+                // Subsequent rows
+                var dist = odo > previousOdo ? (odo - previousOdo) : 0;
+                var kml = amt > 0 ? (dist / amt) : 0;
+                var rsKm = dist > 0 ? (cost / dist) : 0;
 
-            if (odo > 0) previousOdo = odo;
+                totalFuelUsed += amt;
+                totalFuelCost += cost;
+                
+                if (odo > 0) endOdo = odo;
+                previousOdo = odo;
+
+                if(date !== '--' && pricePerL > 0) {
+                    notePrices.push(sym + ' ' + Math.round(pricePerL) + ' on ' + date);
+                }
+
+                prTbody.innerHTML += [
+                    '<tr>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:left">' + date + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + (odo > 0 ? fmt(odo) : '--') + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + sym + ' ' + fmt(cost) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + sym + ' ' + Math.round(pricePerL) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + fmt(amt, 2) + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + (dist > 0 ? fmt(dist) : '--') + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + (kml > 0 ? fmt(kml, 2) : '--') + '</td>',
+                    '  <td style="padding:8px;border:1px solid #ddd;text-align:right">' + (rsKm > 0 ? fmt(rsKm, 2) : '--') + '</td>',
+                    '</tr>'
+                ].join('');
+            }
         });
 
-        document.getElementById('fcTotalLiters').textContent    = totalLiters.toFixed(1);
-        document.getElementById('fcTotalDistance').textContent  = totalDistance.toFixed(1);
-        document.getElementById('fcAvgConsumption').textContent = (totalDistance > 0 && totalLiters > 0)
-            ? (totalDistance / totalLiters).toFixed(2)
-            : '0.00';
+        var totalDist = endOdo > startOdo ? (endOdo - startOdo) : 0;
+        var overallKml = totalFuelUsed > 0 ? (totalDist / totalFuelUsed) : 0;
+        var l100km = overallKml > 0 ? (100 / overallKml) : 0;
+        var avgCostKm = totalDist > 0 ? (totalFuelCost / totalDist) : 0;
+
+        // Update Summary Table
+        document.getElementById('prStartOdo').textContent = fmt(startOdo) + ' km';
+        document.getElementById('prEndOdo').textContent = fmt(endOdo) + ' km';
+        document.getElementById('prTotalDist').textContent = fmt(totalDist) + ' km';
+        document.getElementById('prTotalFuel').textContent = fmt(totalFuelUsed, 2) + ' L';
+        document.getElementById('prTotalCost').textContent = sym + ' ' + fmt(totalFuelCost);
+        document.getElementById('prKml').textContent = fmt(overallKml, 2) + ' km/L';
+        document.getElementById('prL100km').textContent = fmt(l100km, 2) + ' L/100 km';
+        document.getElementById('prCostPerKm').textContent = sym + ' ' + fmt(avgCostKm, 2);
+
+        // Update Text Summary
+        var distText = endOdo + ' - ' + startOdo + ' = ' + fmt(totalDist) + ' km';
+        document.getElementById('prCalcDist').textContent = distText;
+        document.getElementById('prCalcFuel').textContent = fmt(totalFuelUsed, 2) + ' L';
+        
+        var consText = fmt(totalDist) + ' / ' + fmt(totalFuelUsed, 2) + ' = ' + fmt(overallKml, 2) + ' km/L';
+        document.getElementById('prCalcCons').textContent = consText;
+        document.getElementById('prCalcL100').textContent = fmt(l100km, 2) + ' L/100 km';
+        document.getElementById('prCalcCost').textContent = sym + ' ' + fmt(totalFuelCost);
+        document.getElementById('prCalcAvgCost').textContent = sym + ' ' + fmt(avgCostKm, 2) + '/km';
+
+        // Update Note
+        var note = 'Note: Each fuel filling uses its actual fuel price: ';
+        if (notePrices.length > 0) {
+            note += notePrices.join(' and ') + '. ';
+        }
+        note += 'The ' + (firstDate||'first') + ' filling is treated as the starting baseline, subsequent fills are used to calculate tour consumption.';
+        document.getElementById('prNotes').textContent = note;
     }
 };
