@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | FUEL CALCULATOR MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=12';
-import { Utils } from '../utils.js?v=12';
+import { DB }    from '../db.js?v=13';
+import { Utils } from '../utils.js?v=13';
 
 export const FuelCalcModule = {
     _container: null,
@@ -55,8 +55,17 @@ export const FuelCalcModule = {
             '          </select>',
             '        </div>',
             '        <div class="form-group">',
+            '          <label class="form-label">Driver Name</label>',
+            '          <input type="text" class="form-input" id="fcDriver" placeholder="Enter Driver Name" list="fcDriversList">',
+            '          <datalist id="fcDriversList">' + dOptions + '</datalist>',
+            '        </div>',
+            '        <div class="form-group">',
             '          <label class="form-label">Route / Trip Info</label>',
             '          <input type="text" class="form-input" id="fcRoute" placeholder="e.g. Complete Tour / Real Fuel Data">',
+            '        </div>',
+            '        <div class="form-group">',
+            '          <label class="form-label">Prepared By</label>',
+            '          <input type="text" class="form-input" id="fcPreparedBy" placeholder="Enter Name">',
             '        </div>',
             '      </div>',
             '    </div>',
@@ -87,7 +96,8 @@ export const FuelCalcModule = {
             '<div class="print-only" id="printReport">',
             '  <div style="text-align:center;margin-bottom:30px;">',
             '    <h1 style="margin:0;font-size:24px;text-transform:uppercase;">VEHICLE FUEL CONSUMPTION REPORT</h1>',
-            '    <p style="margin:5px 0 0 0;font-size:16px;color:#555;">Vehicle No. <span id="prReg" style="font-weight:bold">--</span> — <span id="prRoute">--</span></p>',
+            '    <p style="margin:5px 0 0 0;font-size:16px;color:#555;">Vehicle No. <span id="prReg" style="font-weight:bold">--</span> | Driver: <span id="prDriver" style="font-weight:bold">--</span></p>',
+            '    <p style="margin:5px 0 0 0;font-size:14px;color:#555;"><span id="prRoute">--</span></p>',
             '  </div>',
 
             '  <table style="width:100%;max-width:600px;margin:0 auto 30px auto;border-collapse:collapse;font-size:14px;">',
@@ -129,6 +139,17 @@ export const FuelCalcModule = {
             '    <p style="margin:0">• Average fuel cost = <strong id="prCalcAvgCost">--</strong></p>',
             '    <p style="margin-top:20px;font-size:11px;color:#777;" id="prNotes">Note: Each fuel filling uses its actual fuel price. The starting fill is treated as baseline, subsequent fills are used to calculate tour consumption.</p>',
             '  </div>',
+
+            '  <div style="margin-top:60px;display:flex;justify-content:space-between;page-break-inside:avoid;">',
+            '    <div style="text-align:center;width:250px;">',
+            '      <div style="margin-bottom:10px;font-style:italic;" id="prSignPreparedBy"></div>',
+            '      <div style="border-top:1px solid #000;padding-top:5px;font-weight:bold;">Prepared By</div>',
+            '    </div>',
+            '    <div style="text-align:center;width:250px;">',
+            '      <div style="margin-bottom:10px;">&nbsp;</div>',
+            '      <div style="border-top:1px solid #000;padding-top:5px;font-weight:bold;">Approved By</div>',
+            '    </div>',
+            '  </div>',
             '</div>',
 
             // Print styles
@@ -158,6 +179,8 @@ export const FuelCalcModule = {
         var printBtn = document.getElementById('fcPrintBtn');
         var vehicle  = document.getElementById('fcVehicle');
         var route    = document.getElementById('fcRoute');
+        var driver   = document.getElementById('fcDriver');
+        var prepBy   = document.getElementById('fcPreparedBy');
 
         if (addBtn)   addBtn.addEventListener('click',  function() { FuelCalcModule._addRow(); });
         if (printBtn) printBtn.addEventListener('click', function() {
@@ -170,6 +193,12 @@ export const FuelCalcModule = {
         });
         if (route) route.addEventListener('input', function() {
             document.getElementById('prRoute').textContent = route.value || 'Complete Tour / Real Fuel Data';
+        });
+        if (driver) driver.addEventListener('input', function() {
+            document.getElementById('prDriver').textContent = driver.value || '--';
+        });
+        if (prepBy) prepBy.addEventListener('input', function() {
+            document.getElementById('prSignPreparedBy').textContent = prepBy.value || '';
         });
     },
 
