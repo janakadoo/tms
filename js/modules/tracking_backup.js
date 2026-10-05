@@ -1,6 +1,6 @@
 ﻿/* js/modules/tracking.js */
-import { Utils } from '../utils.js?v=10';
-import { Store } from '../store.js?v=10';
+import { Utils } from '../utils.js?v=11';
+import { Store } from '../store.js?v=11';
 
 export const TrackingModule = {
     init: (container) => {
