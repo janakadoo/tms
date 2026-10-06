@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | TRIPS MODULE — with Fuel Consumption Monitor
    ================================================================ */
-import { DB }    from '../db.js?v=13';
-import { Utils } from '../utils.js?v=13';
+import { DB }    from '../db.js?v=14';
+import { Utils } from '../utils.js?v=14';
 
 export const TripModule = {
     _container: null,

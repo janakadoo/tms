@@ -1,20 +1,20 @@
 /* ================================================================
    TMS | APP.JS — Main Application Controller + Dashboard
    ================================================================ */
-import { DB }    from './db.js?v=13';
-import { Utils } from './utils.js?v=13';
+import { DB }    from './db.js?v=14';
+import { Utils } from './utils.js?v=14';
 
-import { VehicleModule }       from './modules/vehicles.js?v=13';
-import { DriverModule }        from './modules/drivers.js?v=13';
-import { TripModule }          from './modules/trips.js?v=13';
-import { FuelModule }          from './modules/fuel.js?v=13';
-import { FuelCalcModule }      from './modules/fuel_calc.js?v=13';
-import { ExpenseModule }       from './modules/expenses.js?v=13';
-import { MaintenanceModule }   from './modules/maintenance.js?v=13';
-import { ReportsModule }       from './modules/reports.js?v=13';
-import { NotificationsModule } from './modules/notifications.js?v=13';
-import { SettingsModule }      from './modules/settings.js?v=13';
-import { TrackingModule }      from './modules/tracking.js?v=13';
+import { VehicleModule }       from './modules/vehicles.js?v=14';
+import { DriverModule }        from './modules/drivers.js?v=14';
+import { TripModule }          from './modules/trips.js?v=14';
+import { FuelModule }          from './modules/fuel.js?v=14';
+import { FuelCalcModule }      from './modules/fuel_calc.js?v=14';
+import { ExpenseModule }       from './modules/expenses.js?v=14';
+import { MaintenanceModule }   from './modules/maintenance.js?v=14';
+import { ReportsModule }       from './modules/reports.js?v=14';
+import { NotificationsModule } from './modules/notifications.js?v=14';
+import { SettingsModule }      from './modules/settings.js?v=14';
+import { TrackingModule }      from './modules/tracking.js?v=14';
 
 let _dashCharts = {};
 

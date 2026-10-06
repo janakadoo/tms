@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | FUEL CALCULATOR MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=13';
-import { Utils } from '../utils.js?v=13';
+import { DB }    from '../db.js?v=14';
+import { Utils } from '../utils.js?v=14';
 
 export const FuelCalcModule = {
     _container: null,
@@ -18,6 +18,10 @@ export const FuelCalcModule = {
 
         const vOptions = vehicles.map(function(v) {
             return '<option value="' + v.id + '">' + Utils.esc(v.reg_no) + ' - ' + Utils.esc(v.brand || '') + '</option>';
+        }).join('');
+
+        const dOptions = drivers.map(function(d) {
+            return '<option value="' + Utils.esc(d.name) + '">';
         }).join('');
 
         const sym = DB.Settings.get('currency_symbol') || 'Rs.';

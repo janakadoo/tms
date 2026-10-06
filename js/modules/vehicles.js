@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | VEHICLES MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=13';
-import { Utils } from '../utils.js?v=13';
+import { DB }    from '../db.js?v=14';
+import { Utils } from '../utils.js?v=14';
 
 export const VehicleModule = {
     _container: null,
