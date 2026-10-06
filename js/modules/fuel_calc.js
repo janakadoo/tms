@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | FUEL CALCULATOR MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=14';
-import { Utils } from '../utils.js?v=14';
+import { DB }    from '../db.js?v=15';
+import { Utils } from '../utils.js?v=15';
 
 export const FuelCalcModule = {
     _container: null,
@@ -91,9 +91,35 @@ export const FuelCalcModule = {
             '      </table>',
             '    </div>',
             '  </div>',
-            '  <div style="padding:1rem;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.2);color:var(--emerald)">',
+            '  <div style="padding:1rem;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.2);color:var(--emerald);margin-bottom:1.5rem">',
             '    <strong>Tip:</strong> The first row is treated as the starting baseline. Subsequent fills are used to calculate the tour consumption.',
             '  </div>',
+
+            // --- SCREEN SUMMARY ---
+            '  <div class="card" style="margin-bottom:1.5rem">',
+            '    <div class="card-body">',
+            '      <h3 style="margin-top:0;margin-bottom:1rem;font-size:1.1rem;color:var(--text-primary)">Live Calculation Summary</h3>',
+            '      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">',
+            '        <div>',
+            '          <div style="font-size:0.8rem;color:var(--text-secondary)">Total Distance</div>',
+            '          <div style="font-size:1.5rem;font-weight:bold;color:var(--text-primary)" id="scrTotalDist">--</div>',
+            '        </div>',
+            '        <div>',
+            '          <div style="font-size:0.8rem;color:var(--text-secondary)">Total Fuel Used</div>',
+            '          <div style="font-size:1.5rem;font-weight:bold;color:var(--text-primary)" id="scrTotalFuel">--</div>',
+            '        </div>',
+            '        <div>',
+            '          <div style="font-size:0.8rem;color:var(--text-secondary)">Overall Consumption</div>',
+            '          <div style="font-size:1.5rem;font-weight:bold;color:var(--primary)" id="scrKml">--</div>',
+            '        </div>',
+            '        <div>',
+            '          <div style="font-size:0.8rem;color:var(--text-secondary)">Total Cost</div>',
+            '          <div style="font-size:1.5rem;font-weight:bold;color:var(--text-primary)" id="scrTotalCost">--</div>',
+            '        </div>',
+            '      </div>',
+            '    </div>',
+            '  </div>',
+
             '</div>',
 
             // --- PRINT UI (Hidden on screen) ---
@@ -388,5 +414,18 @@ export const FuelCalcModule = {
         }
         note += 'The ' + (firstDate||'first') + ' filling is treated as the starting baseline, subsequent fills are used to calculate tour consumption.';
         document.getElementById('prNotes').textContent = note;
+
+        // Update Screen UI Summary
+        var eScrDist = document.getElementById('scrTotalDist');
+        if (eScrDist) eScrDist.textContent = fmt(totalDist) + ' km';
+        
+        var eScrFuel = document.getElementById('scrTotalFuel');
+        if (eScrFuel) eScrFuel.textContent = fmt(totalFuelUsed, 2) + ' L';
+        
+        var eScrCost = document.getElementById('scrTotalCost');
+        if (eScrCost) eScrCost.textContent = sym + ' ' + fmt(totalFuelCost);
+        
+        var eScrKml = document.getElementById('scrKml');
+        if (eScrKml) eScrKml.textContent = fmt(overallKml, 2) + ' km/L';
     }
 };

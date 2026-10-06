@@ -1,8 +1,8 @@
 /* ================================================================
    TMS | FUEL MODULE
    ================================================================ */
-import { DB }    from '../db.js?v=14';
-import { Utils } from '../utils.js?v=14';
+import { DB }    from '../db.js?v=15';
+import { Utils } from '../utils.js?v=15';
 
 export const FuelModule = {
     _container: null,
